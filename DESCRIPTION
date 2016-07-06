@@ -3,19 +3,20 @@ Type: Package
 Title: Algorithms for high-throughput sequencing of antigen-specific T cells
 Version: 0.1.0
 Authors@R: person("Edward", "Lee", email = "email.edwardlee@gmail.com", role = c("aut", "cre"))
-Description: More about what it does (maybe more than one line)
+Description: Provides algorithms for frequency-based pairing of alpha-beta T
+  cell receptors.
 License: GPL-3
 LazyData: TRUE
 Imports:
     Rcpp (>= 0.12.3),
-    clue,
-    dplyr,
-    multicool
+    clue (>= 0.3-50),
+    dplyr (>= 0.4.3),
+    multicool (>= 0.1-9)
 LinkingTo: Rcpp
 Suggests:
     knitr,
     rmarkdown
 VignetteBuilder: knitr
 RoxygenNote: 5.0.1
-URL: http://github.com/EdwardSLee/alphabetr
-BugReports: http://github.com/EdwardSLee/alphabetr
+URL: http://github.com/edwardslee/alphabetr
+BugReports: http://github.com/edwardslee/alphabetr

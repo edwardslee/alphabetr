@@ -21,7 +21,7 @@
 #'    the clone
 #' @examples asdfas
 #' @export
-dual_tail <- function(alpha, beta, freq_results, cells, population, error) {
+dual_tail <- function(alpha, beta, freq_results, cells, population) {
   freq_results <- freq_results[order(freq_results[, "MLE"], decreasing = TRUE), ]
   freq_results <- freq_results[!is.na(freq_results[, "MLE"]), ]
 
@@ -49,21 +49,10 @@ dual_tail <- function(alpha, beta, freq_results, cells, population, error) {
           f2 <- x[combos[2, ind], "MLE"]                # freq est of beta alpha2
           exp_plates <- 0                               # expected number of plates
           for (samp in seq_along(sample_size_well)) {                  # find the number of expected well apperances in each column
-            # print(paste("sample", samp))
             number_cells <- sample_size_well[samp]
-            P_both <- 0
-            for (n1 in 1:(40 - 1)) {
-              for (n2 in 1:(40 - n1)) {
-                P_both <- P_both +
-                  multicool::multinom(c(n1, n2, 40 - n1 - n2),
-                                      counts = TRUE) *
-                  f1^n1 * f2^n2 * (1 - f1 - f2) ^ (40 - n1 - n2) *
-                  (error^n1 * (1 - error^n2)^2 + (1 - error^n1)^2 * error^n2 +
-                     (1 - error^n1)^2 * (1 - error^n2)^2
-                   )
-              }
-            }
-            exp_plates <- exp_plates + numb_sample[samp] * P_both
+            exp_plates <- numb_sample[samp] *
+              (1 - (1 - f1)^number_cells - (1 - f2)^number_cells +
+                 (1 - (f1 + f2))^number_cells) + exp_plates
           }
           dat_plates <- sum(data_beta[, clon] == 1 &
                               data_alph[, alpha1] == 1 &
@@ -73,7 +62,7 @@ dual_tail <- function(alpha, beta, freq_results, cells, population, error) {
       }
     } # end for going through all beta chains
 
-    rec_tail_new <<- rec
+    rec_tail <<- rec
     if (nrow(rec) > 2) {
       # make decisions on if two clones are independent or actually a dual TCR by
       # looking at the ratio of actual # of wells vs expected # of wells
@@ -94,7 +83,7 @@ dual_tail <- function(alpha, beta, freq_results, cells, population, error) {
       } # end if
     } # end if - nrow
 
-    return(list(results = rec, cluster = clus_ind))
+    list(results = rec, cluster = clus_ind)
   } # end function - dual_procedure
 
   # parameters
@@ -109,5 +98,4 @@ dual_tail <- function(alpha, beta, freq_results, cells, population, error) {
 
   colnames(tail_rec) <- c("beta", "alpha1", "alpha2")
   as.data.frame(tail_rec)
-  return(rec_tail_new)
 }
