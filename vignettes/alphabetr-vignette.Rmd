@@ -15,7 +15,7 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 
 # Introduction
 ## A Brief Welcome
-If you're reading this, you probably have some interest in sequencing T cell receptors (TCR), especially paired alpha-beta (or gamma-delta) sequences of individual TCRs. And you probably have a sense that this is *hard* to do in a high-throughput, scaleable, and efficient way. The immunology community has recently been innovating new and interesting solutions that range from pushing the limits of experimental techniques to using complicated statistical or computationals models (which includes our own approach). The a dividing fragmentation of techniques that I perceive just confirms the reality that we don't have a good standard for getting paired TCR sequences. My hope is that this vignette will be clear and transparent in showing how we thought to solve this problem, not as be-all panacea for our sequencing woes but as a contribution towards the greater goal of moving the field closer to an industry standard. The main purpose of this vignette is to demonstrate how to obtain the resuls of our paper^[Paper was submitted recently] and hopefully give you the tools to do simulations of your own.
+If you're reading this, you probably have some interest in sequencing T cell receptors (TCR), especially paired alpha-beta (or gamma-delta) sequences of individual TCRs. And you probably have a sense that this is *hard* to do in a high-throughput, scaleable, and efficient way. The immunology community has recently been innovating new and interesting solutions that range from pushing the limits of experimental techniques to using complicated statistical or computationals models (which includes our own approach). The dividing fragmentation of techniques that I perceive just confirms the reality that we don't have a good standard for getting paired TCR sequences. My hope is that this vignette will be clear and transparent in showing how we thought to solve this problem, not as be-all panacea for our sequencing woes but as a contribution towards the greater goal of moving the field closer to an industry standard. The main purpose of this vignette is to demonstrate how to obtain the results of our paper^[Paper was submitted recently] and how to do simulations of your own.
 
 ## Immunology background
 Under construction.
@@ -24,8 +24,6 @@ T cell receptors (TCR) are made up of two chains, an alpha chain and a beta chai
 
 ## Our approach
 Under construction.
-
-The approach in `alphabetr` at its core is mathematical and statistical with a heuristic favlor.  
 
 <!-- # Quick startup guide -->
 <!-- This section will get you up and running the code really quickly with minimal explanation. The next section provides more details about each function.  -->
@@ -49,7 +47,7 @@ Figure 1 shows us what functions to use and when to use them. Our goals are to:
 
 **Estimating clonal frequencies.** The final list of candidate clones, which includes both single-alpha and dual-alpha clones, is then passed into `freq_estimate()` in order to get a final list of frequen estimates and 95% frequency confidence intervals. The package includes some helper functions to amend the original list of candidate pairs with the newly determined dual-alpha clones (used below in the rest of the vignette).
 
-```{r, out.width = 650, fig.retina = NULL, fig.cap = "Figure 1", echo = FALSE}
+```{r echo = FALSE, out.width = 650, fig.retina = NULL, fig.cap = "Figure 1"}
 knitr::include_graphics("overview.png")
 ```
 
@@ -59,7 +57,7 @@ Simulating the experimental data involves choosing parameters for two domains:
 1. The clonal structure of the T cell population of interest
 2. The sequencing experiment
 
-Both are described in Figure .
+<!-- Both are described in Figure . -->
 
 **Clonal structure.** We create a T cell population `create_clones()` is fully described below, so all I want to do is illustrate what *degree of sharing* means. Suppose the clones in Figure represent our population of interest. We have four unique alpha chains (a1, a2, a3, a4), one of which is shared by two clones (a2 is shared by a2b1, a2b3). In this population, 25% of the alpha chains are shared by two clones, and 75% of the alpha chains are not shared.
 
