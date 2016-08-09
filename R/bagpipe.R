@@ -42,6 +42,7 @@ NULL
 
 bagpipe <- function(alpha, beta, replicates = 100, frac = 0.75,
                     thres = c(.3, .6, .9), bootstrap = FALSE) {
+  browser()
   # If user asks for bootstrapping, then the resampled size must be equal
   # to the original sample size
   if(bootstrap == TRUE) frac <- 1.0

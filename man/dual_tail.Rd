@@ -4,7 +4,7 @@
 \alias{dual_tail}
 \title{Discriminate between beta sharing clones and dual TCR clones.}
 \usage{
-dual_tail(alpha, beta, freq_results, cells, population, error)
+dual_tail(alpha, beta, freq_results, cells, population)
 }
 \arguments{
 \item{freq_results}{Output of \code{freq_estimate()}}

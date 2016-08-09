@@ -2,18 +2,35 @@
 % Please edit documentation in R/create_clones.R
 \name{create_clones}
 \alias{create_clones}
-\title{Create a synthetic list of clones}
+\title{Create a synthetic set of clones with a specific underlying clonal structure}
 \usage{
-create_clones(numb_beta = 1000, dual = 0.1)
+create_clones(numb_beta = 1000, dual = 0.1, alpha_sharing = c(0.816,
+  0.085, 0.021, 0.007, 0.033, 0.005, 0.033), beta_sharing = c(0.859, 0.076,
+  0.037, 0.019, 0.009))
 }
 \arguments{
-\item{numb_beta}{The number of unique betas in the population}
+\item{numb_beta}{The number of unique betas in the clonal population}
 
 \item{dual}{The proportion of clones that are dual TCR clones, i.e. has two
 distinct alpha chains}
+
+\item{alpha_sharing}{A vector where the ith position represents the
+proportion of alpha chains that are shared by i clones; alpha chains can
+be shared by up to 6 clones}
+
+\item{beta_sharing}{A vector where the ith position represents the
+proportion of beta chains that are shared by i clones; beta chains can be
+shared by up to 5 clones}
+}
+\value{
+A n by 3 matrix, where n is the total number of clones, column 1 is
+   the beta index of the clone, column 2 is the alpha1 index of the clone,
+   and column 3 is the alpha2 index of the clone. If the clone is a single
+   TCR clone, then col 1 and col2 will have the same value. If the clone is
+   a dual TCR clone, then the indices in col 1 and col 2 will be different.
 }
 \description{
-\code{create_clones()} creates a list of (beta, alpha1, alpha2) sets that
+\code{create_clones()} creates a set of (beta, alpha1, alpha2) triples that
    represents the indices of the chains of clones. The function will take a
    fixed number of unique beta chains that are in the T cell population, and
    then use the degree of beta and alpha sharing to determine the number of
@@ -21,5 +38,15 @@ distinct alpha chains}
    assigned to each other, with a proportion of them being dual TCR clones
    (i.e. alpha1 != alpha2), forming our random list of clones with their
    chain indices.
+}
+\examples{
+   # Creating a population containing 1000 beta chains; 30\% of clones with
+   # dual TCRs; 75\% beta shared by one clone, 20\% by two clones, 5\% by three
+   # clones; 80\% alpha chains shared by one clone, 15\% by two clones, and 5\%
+   # by three clones
+   TCR_pairings <- create_clones(numb_beta = 1000, dual = .3,
+                              alpha_sharing = c(0.80, 0.15, 0.05),
+                              beta_sharing = c(0.75, 0.20, 0.05))
+
 }
 
