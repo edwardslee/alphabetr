@@ -9,8 +9,8 @@ dual_eval <- function(duals, prop, pair, TCR_sizes, number_skewed, TCR_dual) {
       dual_top <- TCR_sizes[which(TCR_sizes[1:number_skewed, 2] != TCR_sizes[1:number_skewed, 3]), , drop = FALSE]
 
       #------------ number correct -------------#
-      # determine the number of correct dual top clones
-      numb_correct <- 0
+      # determine the number of correct dual clones in the list
+      numb_correct_all <- 0
       for (i in 1:nrow(duals)) {
         ind_beta  <- duals[i, 1]
         ind_alph1 <- duals[i, 2]
@@ -19,6 +19,21 @@ dual_eval <- function(duals, prop, pair, TCR_sizes, number_skewed, TCR_dual) {
         if (any(TCR_dual[, 1] == ind_beta &
                 ((TCR_dual[, 2] == ind_alph1 & TCR_dual[, 3] == ind_alph2) |
                  (TCR_dual[, 2] == ind_alph2 & TCR_dual[, 3] == ind_alph1))
+        )) {
+          numb_correct_all <- numb_correct_all + 1
+        }
+      } # end for - i
+
+      # determine the number of correct top dual clones in the list
+      numb_correct <- 0
+      for (i in 1:nrow(duals)) {
+        ind_beta  <- duals[i, 1]
+        ind_alph1 <- duals[i, 2]
+        ind_alph2 <- duals[i, 3]
+
+        if (any(dual_top[, 1] == ind_beta &
+                ((dual_top[, 2] == ind_alph1 & dual_top[, 3] == ind_alph2) |
+                 (dual_top[, 2] == ind_alph2 & dual_top[, 3] == ind_alph1))
         )) {
           numb_correct <- numb_correct + 1
         }
