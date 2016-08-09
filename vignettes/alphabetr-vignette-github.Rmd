@@ -2,7 +2,9 @@
 title: "Using ALPHABETR to determine alpha/beta TCR pairs"
 author: "Edward S. Lee"
 date: "`r Sys.Date()`"
-output: github_document
+output:
+  md_document:
+    variant: markdown_github
 ---
 
 ```{r, echo = FALSE}
