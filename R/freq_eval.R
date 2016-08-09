@@ -48,7 +48,7 @@ freq_eval <- function(freq, number_skewed, TCR_sizes, numb_clones, prop_top) {
       if (ind_alph1 == ind_alph2) {
         ind <- which(top_clones[, 1] == ind_beta &
                        (top_clones[, 2] == ind_alph1 | top_clones[, 3] == ind_alph1))
-        freq[i, "answer"] <- TCR_sizes[ind, 4]
+        freq[i, "answer"] <- TCR_sizes[ind[1], 4]  #in situation where two dual clones have the same beta and alph1 but diff alph2s
         if (TCR_sizes[ind, 4] <= freq[i, "CI_up"] & TCR_sizes[ind, 4] >= freq[i, "CI_low"]) {
           freq[i, "correct"] <- 1
         }
@@ -56,6 +56,7 @@ freq_eval <- function(freq, number_skewed, TCR_sizes, numb_clones, prop_top) {
         ind <- which(top_clones[, 1] == ind_beta &
                        ((top_clones[, 2] == ind_alph1 & top_clones[, 3] == ind_alph2) |
                           (top_clones[, 2] == ind_alph2 & top_clones[, 3] == ind_alph1)))
+        ind <- ind[1]
         if (TCR_sizes[ind, 4] <= freq[i, "CI_up"] & TCR_sizes[ind, 4] >= freq[i, "CI_low"]) {
           freq[i, "correct"] <- 1
           freq[i, "answer"] <- TCR_sizes[ind, 4]

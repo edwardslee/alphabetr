@@ -120,9 +120,9 @@ dual_eval <- function(duals, prop, pair, TCR_sizes, number_skewed, TCR_dual) {
         ind_alph1 <- duals[i, 2]
         ind_alph2 <- duals[i, 3]
 
-        if (any(TCR_dual[, 1] == ind_beta &
-                ((TCR_dual[, 2] == ind_alph1 & TCR_dual[, 3] == ind_alph2) |
-                 (TCR_dual[, 2] == ind_alph2 & TCR_dual[, 3] == ind_alph1))
+        if (any(dual_tail[, 1] == ind_beta &
+                ((dual_tail[, 2] == ind_alph1 & dual_tail[, 3] == ind_alph2) |
+                 (dual_tail[, 2] == ind_alph2 & dual_tail[, 3] == ind_alph1))
         )) {
           numb_correct <- numb_correct + 1
         }
