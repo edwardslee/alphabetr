@@ -137,6 +137,7 @@ create_clones <- function(numb_beta = 1000, dual = .1,
                         6*shared_alph7)
     # number of alphas involved in single TCR clone
     numb_sing_alph <- numb_unq_alph - numb_shared_alphs
+    if (numb_sing_alph < 0) stop("Impossible alpha sharing scenario. Reduce the degree of sharing")
     # matrix recording how many clones share alpha_i;
     # col 1 = i, col 2 = # of clones sharing alpha_i
     clones_per_alph <- matrix(c(1:numb_unq_alph, rep(1, numb_unq_alph)), ncol = 2)
