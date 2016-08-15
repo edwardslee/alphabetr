@@ -35,9 +35,11 @@
 #'                               beta_sharing = c(0.75, 0.20, 0.05))
 #'
 #' @export
-create_clones <- function(numb_beta = 1000, dual = .1,
-                          alpha_sharing = c(.816, .085, .021, .007, .033, .005, .033),
-                          beta_sharing = c(.859, .076, .037, .019, .009)) {
+create_clones <- function(numb_beta = 1000, dual, alpha_sharing, beta_sharing) {
+  # sharing for paper:
+  #   alpha_sharing = c(.816, .085, .021, .007, .033, .005, .033)
+  #   beta_sharing = c(.859, .076, .037, .019, .009)
+
   # Checking sharing inputs
   if (length(alpha_sharing) == 0 | any(is.na(alpha_sharing)) | any(alpha_sharing < 0)){
     stop("Please include a valid alpha chain sharing vector")

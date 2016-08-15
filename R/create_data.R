@@ -64,7 +64,7 @@ create_data <- function(TCR, plates = 5, error = .15, skewed = 15,
         i2 <- x + half_len
         if (choice_alph[i1] == choice_alph[i2]) remove_ind <- c(remove_ind, i2)
       }
-      choice_alph <- choice_alph[-remove_ind]
+      if (length(remove_ind > 0)) choice_alph <- choice_alph[-remove_ind]
       choice_beta <- as.vector(TCR[rand, 1])
 
       for (x in choice_alph)  if(runif(1) > error) data_alph[ind_well, x] <- 1
