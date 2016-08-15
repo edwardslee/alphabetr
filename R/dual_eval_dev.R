@@ -25,6 +25,7 @@ dual_eval_dev <- function(duals, pair, TCR_sizes, number_skewed, TCR_dual) {
     # determine the number of correct top and tail dual clones in the list
     numb_correct_top  <- 0
     numb_correct_tail <- 0
+
     for (i in 1:nrow(duals)) {
       ind_beta  <- duals[i, 1]
       ind_alph1 <- duals[i, 2]
@@ -60,8 +61,8 @@ dual_eval_dev <- function(duals, pair, TCR_sizes, number_skewed, TCR_dual) {
       ind_alph1 <- dual_top[i, 2]
       ind_alph2 <- dual_top[i, 3]
 
-      if (any(dual_top[, 1] == ind_beta & dual_top[, 2] == ind_alph1) &
-          any(dual_top[, 1] == ind_beta & dual_top[, 3] == ind_alph2)) {
+      if (any(pair[, 1] == ind_beta & pair[, 2] == ind_alph1) &
+          any(pair[, 1] == ind_beta & pair[, 3] == ind_alph2)) {
         numb_poss_top <- numb_poss_top + 1
         # then check to see if the top dual has any unestimateable freq
         if (any(unest_pairs[, 1] == ind_beta & unest_pairs[, 2] == ind_alph1) |
@@ -71,25 +72,13 @@ dual_eval_dev <- function(duals, pair, TCR_sizes, number_skewed, TCR_dual) {
       }
     }
 
-    for (i in 1:nrow(TCR_dual)) {
-      ind_beta  <- TCR_dual[i, 1]
-      ind_alph1 <- TCR_dual[i, 2]
-      ind_alph2 <- TCR_dual[i, 3]
+    for (i in 1:nrow(dual_tail)) {
+      ind_beta  <- dual_tail[i, 1]
+      ind_alph1 <- dual_tail[i, 2]
+      ind_alph2 <- dual_tail[i, 3]
 
-      # check if these indices represent a top dual
-      if (any(dual_top[, 1] == ind_beta & dual_top[, 2] == ind_alph1) &
-          any(dual_top[, 1] == ind_beta & dual_top[, 3] == ind_alph2)) {
-        numb_poss_top <- numb_poss_top + 1
-        # then check to see if the top dual has any unestimateable freq
-        if (any(unest_pairs[, 1] == ind_beta & unest_pairs[, 2] == ind_alph1) |
-            any(unest_pairs[, 1] == ind_beta & unest_pairs[, 2] == ind_alph2)) {
-          numb_unest_top <- numb_unest_top + 1
-        }
-      }
-
-      # check if these indices represent a tail dual
-      if (any(dual_tail[, 1] == ind_beta & dual_tail[, 2] == ind_alph1) &
-          any(dual_tail[, 1] == ind_beta & dual_tail[, 3] == ind_alph2)) {
+      if (any(pair[, 1] == ind_beta & pair[, 2] == ind_alph1) &
+          any(pair[, 1] == ind_beta & pair[, 3] == ind_alph2)) {
         numb_poss_tail <- numb_poss_tail + 1
         # then check to see if the top dual has any unestimateable freq
         if (any(unest_pairs[, 1] == ind_beta & unest_pairs[, 2] == ind_alph1) |
@@ -97,7 +86,7 @@ dual_eval_dev <- function(duals, pair, TCR_sizes, number_skewed, TCR_dual) {
           numb_unest_tail <- numb_unest_tail + 1
         }
       }
-    } # endfor - i
+    }
 
     # calculating top depths
     if (numb_poss_top == 0) {
@@ -118,14 +107,21 @@ dual_eval_dev <- function(duals, pair, TCR_sizes, number_skewed, TCR_dual) {
     # false dual rate
     fdr <- (nrow(duals) - numb_correct) / nrow(duals)
 
-    return(list(adj_depth_top = adj_depth_top, abs_depth_top = abs_depth_top,
-                adj_depth_tail = adj_depth_tail, abs_depth_tail = abs_depth_tail,
-                fdr = fdr, numb_correct_top = numb_correct_top,
-                numb_correct_tail = numb_correct_tail,
-                numb_poss_top = numb_poss_top, numb_poss_tail = numb_poss_tail,
-                numb_unestimated_top = numb_unest_top,
-                numb_unestimated_tail = numb_unest_tail,
-                numb_duals_ans = nrow(dual_top), numb_cand_duals = nrow(duals)))
+    return(tibble::tibble(
+      fdr = fdr,
+      numb_cand_duals = nrow(duals),
+      adj_depth_top = adj_depth_top,
+      abs_depth_top = abs_depth_top,
+      numb_correct_top = numb_correct_top,
+      numb_duals_ans_top = nrow(dual_top),
+      numb_poss_top = numb_poss_top,
+      numb_unestimated_top = numb_unest_top,
+      adj_depth_tail = adj_depth_tail,
+      abs_depth_tail = abs_depth_tail,
+      numb_correct_tail = numb_correct_tail,
+      numb_duals_ans_tail = nrow(dual_tail),
+      numb_poss_tail = numb_poss_tail,
+      numb_unestimated_tail = numb_unest_tail))
   } else { # no duals determined
     #------ number possible --------#
     numb_poss_top   <- 0
@@ -180,13 +176,20 @@ dual_eval_dev <- function(duals, pair, TCR_sizes, number_skewed, TCR_dual) {
     # false dual rate
     fdr <- NA
 
-    return(list(adj_depth_top = adj_depth_top, abs_depth_top = abs_depth_top,
-                adj_depth_tail = adj_depth_tail, abs_depth_tail = abs_depth_tail,
-                fdr = fdr, numb_correct_top = numb_correct_top,
-                numb_correct_tail = numb_correct_tail,
-                numb_poss_top = numb_poss_top, numb_poss_tail = numb_poss_tail,
-                numb_unestimated_top = numb_unest_top,
-                numb_unestimated_tail = numb_unest_tail,
-                numb_duals_ans = nrow(dual_top), numb_cand_duals = nrow(duals)))
+    return(tibble::tibble(
+      fdr = fdr,
+      numb_cand_duals = nrow(duals),
+      adj_depth_top = adj_depth_top,
+      abs_depth_top = abs_depth_top,
+      numb_correct_top = numb_correct_top,
+      numb_duals_ans_top = nrow(dual_top),
+      numb_poss_top = numb_poss_top,
+      numb_unestimated_top = numb_unest_top,
+      adj_depth_tail = adj_depth_tail,
+      abs_depth_tail = abs_depth_tail,
+      numb_correct_tail = numb_correct_tail,
+      numb_duals_ans_tail = nrow(dual_tail),
+      numb_poss_tail = numb_poss_tail,
+      numb_unestimated_tail = numb_unest_tail))
   } # end if else
 }
