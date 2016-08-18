@@ -65,6 +65,8 @@ create_clones <- function(numb_beta = 1000, dual, alpha_sharing, beta_sharing) {
     beta_sharing <- c(beta_sharing, rep(0, len_zero))
   }
 
+  #this is a git test
+
   # The try_again while loop ensures indices are set up correctly because
   # current implementation can mess up at times; will need to fix in future
   # versions
