@@ -31,8 +31,8 @@
 #'    # clones; 80% alpha chains shared by one clone, 15% by two clones, and 5%
 #'    # by three clones
 #'    TCR_pairings <- create_clones(numb_beta = 1000, dual = .3,
-#'                               alpha_sharing = c(0.80, 0.15, 0.05),
-#'                               beta_sharing = c(0.75, 0.20, 0.05))
+#'                                  alpha_sharing = c(0.80, 0.15, 0.05),
+#'                                  beta_sharing  = c(0.75, 0.20, 0.05))
 #'
 #' @export
 create_clones <- function(numb_beta = 1000, dual, alpha_sharing, beta_sharing) {
@@ -98,7 +98,7 @@ create_clones <- function(numb_beta = 1000, dual, alpha_sharing, beta_sharing) {
                                 rep(5, numb_beta5))
                               )
     shared_mat[, 2] <- clones_per_beta   # row i, col 2 of shared_mat represents how many clones share beta_i
-    rm(clones_per_beta)                     # clear memory
+    rm(clones_per_beta)
 
     # choosing the number of dual alphas for each beta
     numb_clones <- sum(shared_mat[, 2])     # total number of clones
@@ -174,10 +174,10 @@ create_clones <- function(numb_beta = 1000, dual, alpha_sharing, beta_sharing) {
         last_alph_dual <- ind_alph + 2*numb.dual - 1                                      # the alphas to be used are ind_alph to last_alph_dual
         if (length(unique(alpha[ind_alph:last_alph_dual])) != length(alpha[ind_alph:last_alph_dual])) try_again <- 1
         TCR[ind_TCR:(ind_TCR+numb.dual - 1),2:3] <- alpha[ind_alph:last_alph_dual]    # assign the alphas to the dual TCR beta clones
-        ind_alph <- ind_alph + 2 * numb.dual                                            # the next alpha after last_alph_dual is ind_alph + 2*numb_dual
-        ind_TCR <- ind_TCR + numb.dual                                                    # the next TCR index is ind_TCR + numb_dual
-        leftover_single <- numb.shared - numb.dual                                            # if numb_dual != number of clones sharing our beta clone, then we have single TCR clones
-        if (leftover_single > 0) {                                                            # if there are single TCR clones
+        ind_alph <- ind_alph + 2 * numb.dual                                          # the next alpha after last_alph_dual is ind_alph + 2*numb_dual
+        ind_TCR <- ind_TCR + numb.dual                                                # the next TCR index is ind_TCR + numb_dual
+        leftover_single <- numb.shared - numb.dual                                    # if numb_dual != number of clones sharing our beta clone, then we have single TCR clones
+        if (leftover_single > 0) {                                                    # if there are single TCR clones
           last_ind_TCR <- ind_TCR + leftover_single - 1
           last_ind_alph <- ind_alph + leftover_single - 1
           TCR[ind_TCR:last_ind_TCR, 2:3] <- alpha[ind_alph:last_ind_alph]             # assign alpha to single TCR clone
