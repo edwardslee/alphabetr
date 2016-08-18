@@ -152,12 +152,11 @@ create_clones_dual <- function(numb_beta = 1000, dual_beta = 0, dual_alpha = 0.3
                               rep(5, n_alph5),
                               rep(6, n_alph6),
                               rep(7, n_alph7)
-  ))
+                            ))
 
   ind_alph <- sample(1:numb_alph)
 
   numb_dual <- ceiling(dual_alpha * nrow(clones))
-
   assign_dual <- sample(seq(from = 1, to = sum(clones_per_alph) - 1, by = 2), size = numb_dual)
 
   browser()
