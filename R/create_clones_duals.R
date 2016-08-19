@@ -37,8 +37,8 @@
 #' @export
 create_clones_dual <- function(numb_beta = 1000, dual_beta = 0, dual_alpha = 0.3, alpha_sharing, beta_sharing) {
   # sharing for paper:
-    # alpha_sharing = c(.816, .085, .021, .007, .033, .005, .033)
-    # beta_sharing = c(.859, .076, .037, .019, .009)
+  # alpha_sharing = c(.816, .085, .021, .007, .033, .005, .033)
+  # beta_sharing = c(.859, .076, .037, .019, .009)
 
   # Checking sharing inputs
   if (length(alpha_sharing) == 0 | any(is.na(alpha_sharing)) | any(alpha_sharing < 0)){
@@ -80,7 +80,7 @@ create_clones_dual <- function(numb_beta = 1000, dual_beta = 0, dual_alpha = 0.3
                               rep(3, n_beta3),
                               rep(4, n_beta4),
                               rep(5, n_beta5)
-                              ))
+  ))
 
   ind_beta <- sample(1:numb_beta)
 
@@ -142,8 +142,8 @@ create_clones_dual <- function(numb_beta = 1000, dual_beta = 0, dual_alpha = 0.3
   n_alph7 <- floor(alpha_sharing[7] * numb_alph)
 
   n_alph1   <- numb_alph_used - (2 * n_alph2 + 3 * n_alph3 +
-                            4 * n_alph4 + 5 * n_alph5 +
-                            5 * n_alph6 + 7 * n_alph7)
+                                 4 * n_alph4 + 5 * n_alph5 +
+                                 5 * n_alph6 + 7 * n_alph7)
 
   numb_alph <- n_alph1 + n_alph2 + n_alph3 + n_alph4 +
                n_alph5 + n_alph6 + n_alph7
@@ -156,7 +156,7 @@ create_clones_dual <- function(numb_beta = 1000, dual_beta = 0, dual_alpha = 0.3
                               rep(5, n_alph5),
                               rep(6, n_alph6),
                               rep(7, n_alph7)
-                            ))
+  ))
 
   ind_alph <- sample(1:numb_alph)
 
