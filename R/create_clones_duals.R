@@ -37,8 +37,8 @@
 #' @export
 create_clones_dual <- function(numb_beta = 1000, dual_beta = 0, dual_alpha = 0.3, alpha_sharing, beta_sharing) {
   # sharing for paper:
-  #   alpha_sharing = c(.816, .085, .021, .007, .033, .005, .033)
-  #   beta_sharing = c(.859, .076, .037, .019, .009)
+    # alpha_sharing = c(.816, .085, .021, .007, .033, .005, .033)
+    # beta_sharing = c(.859, .076, .037, .019, .009)
 
   # Checking sharing inputs
   if (length(alpha_sharing) == 0 | any(is.na(alpha_sharing)) | any(alpha_sharing < 0)){
@@ -66,12 +66,13 @@ create_clones_dual <- function(numb_beta = 1000, dual_beta = 0, dual_alpha = 0.3
   }
 
 
+
   # n_beta_i is the number of beta chains that will be shared by i clones
-  n_beta1 <- ceiling(beta_sharing[1] * numb_beta)
   n_beta2 <- ceiling(beta_sharing[2] * numb_beta)
   n_beta3 <- ceiling(beta_sharing[3] * numb_beta)
   n_beta4 <- ceiling(beta_sharing[4] * numb_beta)
   n_beta5 <- ceiling(beta_sharing[5] * numb_beta)
+  n_beta1 <- numb_beta - n_beta2 - n_beta3 - n_beta4 - n_beta5
 
   # this vector will randomly allocate the # of clones sharing a beta chain
   clones_per_beta <- sample(c(rep(1, n_beta1),
@@ -96,6 +97,7 @@ create_clones_dual <- function(numb_beta = 1000, dual_beta = 0, dual_alpha = 0.3
 
   assign_dual <- sample(seq(from = 1, to = sum(clones_per_beta) - 1, by = 2), size = numb_dual)
 
+
   # check to see if the duals we assigned have different indices
   check_dual <- 1
   while(check_dual == 1) {
@@ -112,7 +114,6 @@ create_clones_dual <- function(numb_beta = 1000, dual_beta = 0, dual_alpha = 0.3
   clones <- matrix(nrow = sum(clones_per_beta) - numb_dual, ncol = 4)
   colnames(clones) <- c("beta1", "beta2", "alpha1", "alpha2")
 
-  browser()
   ind_beta_vec <- 1
   ind_clones <- 1
   while(ind_clones <= nrow(clones)) {
@@ -144,6 +145,9 @@ create_clones_dual <- function(numb_beta = 1000, dual_beta = 0, dual_alpha = 0.3
                             4 * n_alph4 + 5 * n_alph5 +
                             5 * n_alph6 + 7 * n_alph7)
 
+  numb_alph <- n_alph1 + n_alph2 + n_alph3 + n_alph4 +
+               n_alph5 + n_alph6 + n_alph7
+
   # this vector will randomly allocate the # of clones sharing a beta chain
   clones_per_alph <- sample(c(rep(1, n_alph1),
                               rep(2, n_alph2),
@@ -156,10 +160,6 @@ create_clones_dual <- function(numb_beta = 1000, dual_beta = 0, dual_alpha = 0.3
 
   ind_alph <- sample(1:numb_alph)
 
-  numb_dual <- ceiling(dual_alpha * nrow(clones))
-  assign_dual <- sample(seq(from = 1, to = sum(clones_per_alph) - 1, by = 2), size = numb_dual)
-
-  browser()
   alph_mat <- matrix(c(ind_alph, clones_per_alph), ncol = 2)
   alph_vec <- vector(length = sum(clones_per_alph))
   ind <- 1
@@ -169,6 +169,9 @@ create_clones_dual <- function(numb_beta = 1000, dual_beta = 0, dual_alpha = 0.3
     ind <- ind + numb_clones
   }
   alph_vec <- sample(alph_vec)
+
+  numb_dual <- ceiling(dual_alpha * nrow(clones))
+  assign_dual <- sample(seq(from = 1, to = sum(clones_per_alph) - 1, by = 2), size = numb_dual)
 
   # check to see if the duals we assigned have different indices
   check_dual <- 1
@@ -198,7 +201,6 @@ create_clones_dual <- function(numb_beta = 1000, dual_beta = 0, dual_alpha = 0.3
     }
   }
 
-  browser()
 
 
 
@@ -207,10 +209,12 @@ create_clones_dual <- function(numb_beta = 1000, dual_beta = 0, dual_alpha = 0.3
 
 
 
-  TCR_dual  <- TCR_dual[complete.cases(TCR_dual), ]
-  TCR_sizes <- TCR[sample(1:numb_clones, replace = FALSE),]
-  colnames(TCR)       <- c("beta", "alpha1", "alpha2")
-  colnames(TCR_sizes) <- c("beta", "alpha1", "alpha2")
-  colnames(TCR_dual)  <- c("beta", "alpha1", "alpha2")
-  list(ordered = TCR, random = TCR_sizes, dual = TCR_dual)
+  ordered   <- clones[order(clones[, 1], decreasing = FALSE), ]
+  dual_alph <- clones[clones[, 3] != clones[, 4], ]
+  dual_beta <- clones[clones[, 1] != clones[, 2], ]
+  colnames(ordered)   <- c("beta1", "beta2", "alpha1", "alpha2")
+  colnames(dual_alph) <- c("beta1", "beta2", "alpha1", "alpha2")
+  colnames(dual_beta) <- c("beta1", "beta2", "alpha1", "alpha2")
+
+  list(TCR = clones, ordered = ordered, dual_alpha = dual_alph, dual_beta = dual_beta)
 } # end function
