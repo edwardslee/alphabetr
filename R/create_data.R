@@ -1,6 +1,6 @@
 #' @export
-create_data <- function(TCR, plates = 5, error = c(.15, 0),
-                        error_mode = c("constant", "constant"),
+create_data <- function(TCR, plates = 5, error_drop = c(.15, .01),
+                        error_seq = c(.05, .01), error_mode = c("constant", "constant"),
                         skewed = 15, prop_top = .5, dist = "linear",
                         numb_cells = matrix(rep(200, 12), rep(5*plates, 12), ncol = 2)
                         ){
@@ -36,13 +36,23 @@ create_data <- function(TCR, plates = 5, error = c(.15, 0),
   # col 7 is the number of different possible substitute sequences
 
   # drop rates: can be a constant drop rate or drop rates distributed on LN dist
-  err_drop <- error[1]
   if (error_mode[1] == "constant") {
+    err_drop <- error_drop[1]
     TCR_drop <- cbind(TCR, err_drop)
   } else if (error_mode[1] == "lognormal") {
-    drop_vec <- rlnorm(numb_clones, meanlog = log(err_drop), sdlog = sqrt(2 * (log(err_drop) - log(.14))))
+    if (length(error_drop) != 2) stop("The error_drop argument must be length 2.")
+
+    # input mean and sd of the error drop rates
+    err_mean <- error_drop[1]
+    err_sd   <- error_drop[2]
+
+    # need to calculate the input parameters of the association normal dist; see vign
+    mu <- log(err_mean) - log((err_sd / err_mean) ^ 2 + 1) / 2
+    sd <- sqrt(log((err_sd / err_mean) ^ 2 + 1))
+
+    drop_vec <- rlnorm(numb_clones, meanlog = mu, sdlog = sd)
     while (any(drop_vec > .9)) {
-      drop_vec <- rlnorm(numb_clones, meanlog = log(err_drop), sdlog = sqrt(2 * (log(err_drop) - log(.14))))
+      drop_vec <- rlnorm(numb_clones, meanlog = mu, sdlog = sd)
     }
     TCR_drop <- cbind(TCR, drop_vec)
   } else {
@@ -51,12 +61,29 @@ create_data <- function(TCR, plates = 5, error = c(.15, 0),
 
 
   err_seq <- error[2]
-  if (error_mode[2] == "constant") {
-    err_alpha <- matrix(nrow = numb_alph)
-    TCR_drop <- cbind(TCR_drop, err_seq, 2)
-  } else if (error_mode[2] == "lognormal") {
 
-    TCR
+  err_seq_alph <- vector(length = numb_alph)
+  err_seq_beta <- vector(length = numb_beta)
+  err_num_alph <- vector(length = numb_alph)
+  err_num_beta <- vector(length = numb_beta)
+
+  if (error_mode[2] == "constant") {
+    err_seq_alph <- rep(error_seq[1],  numb_alph)
+    err_seq_beta <- rep(error_seq[1],  numb_beta)
+    err_num_alph <- rep(2,  numb_alph)
+    err_num_beta <- rep(2,  numb_beta)
+  } else if (error_mode[2] == "lognormal") {
+    # input mean and sd of the error drop rates
+    err_mean <- error_seq[1]
+    err_sd   <- error_seq[2]
+
+    # need to calculate the input parameters of the association normal dist; see vign
+    mu <- log(err_mean) - log((err_sd / err_mean) ^ 2 + 1) / 2
+    sd <- sqrt(log((err_sd / err_mean) ^ 2 + 1))
+
+    err_seq_alph <- rlnorm(numb_alph, meanlog = mu, sdlog = sd)
+    err_seq_beta <- rlnorm(numb_beta, meanlog = mu, sdlog = sd)
+
   } else {
     stop("Invalid error model specification. Choose either 'constant' or 'lognormal'")
   }
@@ -80,23 +107,41 @@ create_data <- function(TCR, plates = 5, error = c(.15, 0),
                      replace = TRUE)
       samp_clones <- TCR_drop[rand, ]
 
-      samp_beta <- samp_clones[runif(nrow(TCR_drop)) > samp_clones[, 4], 1]
+      samp_beta <- matrix(nrow = 2 * nrow(samp_clones), ncol = 2)
+      dual_beta <- which(samp_clones[, 1] != samp_clones[, 2])
+      ind <- 1
+      for (i in seq_len(nrow(samp_clones))) {
+          if (i %in% dual_beta) {
+            samp_beta[ind:(ind + 1), 1] <- samp_clones[i, 1:2]
+            samp_beta[ind:(ind + 1), 2] <- samp_clones[i, 5]
+            ind <- ind + 2
+          } else {
+            samp_beta[ind, 1] <- samp_clones[i, 1]
+            samp_beta[ind, 2] <- samp_clones[i, 5]
+            ind <- ind + 1
+          }
+      }
+      # col 2 of samp beta has the drop rate; beta_i isn't dropped when runif > err
+      samp_beta <- samp_beta[runif(nrow(samp_beta)) > samp_beta[, 2], 1]
+
+      samp_alph <- matrix(nrow = 2 * nrow(samp_clones), ncol = 2)
+      dual_alph <- which(samp_clones[, 3] != samp_clones[, 4])
+      ind <- 1
+      for (i in seq_len(nrow(samp_clones))) {
+        if (i %in% dual_alph) {
+          samp_alph[ind:(ind + 1), 1] <- samp_clones[i, 3:4]
+          samp_alph[ind:(ind + 1), 2] <- samp_clones[i, 5]
+          ind <- ind + 2
+        } else {
+          samp_alph[ind, 1] <- samp_clones[i, 3]
+          samp_alph[ind, 2] <- samp_clones[i, 4]
+          ind <- ind + 1
+        }
+      }
+      # col 2 of samp beta has the drop rate; beta_i isn't dropped when runif > err
+      samp_alph <- samp_alph[runif(nrow(samp_alph)) > samp_alph[, 2], 1]
 
       alph_drop <- rep(samp_clones[, 4], each = 2)
-
-      samp_alph
-
-      # Collecting the alpha chains that are chosen
-      choice_alph    <- as.vector(TCR[rand, 2:3])
-      half_len <- length(choice_alph)/2
-      remove_ind <- vector()
-      for (x in half_len:1) {
-        i1 <- x
-        i2 <- x + half_len
-        if (choice_alph[i1] == choice_alph[i2]) remove_ind <- c(remove_ind, i2)
-      }
-      if (length(remove_ind > 0)) choice_alph <- choice_alph[-remove_ind]
-      choice_beta <- as.vector(TCR[rand, 1])
 
       for (x in choice_alph)  if(runif(1) > error) data_alph[ind_well, x] <- 1
       for (x in choice_beta)  if(runif(1) > error) data_beta[ind_well, x] <- 1
