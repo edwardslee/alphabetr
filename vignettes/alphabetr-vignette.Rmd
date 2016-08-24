@@ -91,6 +91,7 @@ library(alphabetr)
 1. The degree of beta sharing (the proportion of clones that share 1-5 beta chains)
 
 In order to create a population containing
+
 * 1000 unique beta chains
 * 30% of clones with dual TCRs
 * beta-sharing: 75% beta shared by one clone, 20% by two clones, 5% by three clones

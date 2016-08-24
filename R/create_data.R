@@ -2,7 +2,7 @@
 create_data <- function(TCR, plates = 5, error_drop = c(.15, .01),
                         error_seq = c(.05, .01), error_mode = c("constant", "constant"),
                         skewed = 15, prop_top = .5, dist = "linear",
-                        numb_cells = matrix(rep(200, 12), rep(5*plates, 12), ncol = 2)
+                        numb_cells = matrix(c(rep(200, 12), rep(5*plates, 12)), ncol = 2)
                         ){
   wells <- 96 * plates    # 96 well plates
 
@@ -65,8 +65,8 @@ create_data <- function(TCR, plates = 5, error_drop = c(.15, .01),
     err_num_alph <- rep(2,  numb_alph)
     err_num_beta <- rep(2,  numb_beta)
 
-    numb_false_alph <- sum(err_numb_alph)
-    numb_false_beta <- sum(err_numb_beta)
+    numb_false_alph <- sum(err_num_alph)
+    numb_false_beta <- sum(err_num_beta)
 
     false_alph <- vector(mode = "list", length = numb_false_alph)
     false_beta <- vector(mode = "list", length = numb_false_beta)
@@ -89,11 +89,11 @@ create_data <- function(TCR, plates = 5, error_drop = c(.15, .01),
 
     err_seq_alph <- rlnorm(numb_alph, meanlog = mu, sdlog = sd)
     err_seq_beta <- rlnorm(numb_beta, meanlog = mu, sdlog = sd)
-    err_num_alph <- sample(1:4, length = numb_alph)
-    err_num_beta <- sample(1:4, length = numb_beta)
+    err_num_alph <- sample(1:4, size = numb_alph, replace = TRUE)
+    err_num_beta <- sample(1:4, size = numb_beta, replace = TRUE)
 
-    numb_false_alph <- sum(err_numb_alph)
-    numb_false_beta <- sum(err_numb_beta)
+    numb_false_alph <- sum(err_num_alph)
+    numb_false_beta <- sum(err_num_beta)
 
     false_alph <- vector(mode = "list", length = numb_false_alph)
     false_beta <- vector(mode = "list", length = numb_false_beta)
@@ -101,11 +101,11 @@ create_data <- function(TCR, plates = 5, error_drop = c(.15, .01),
     ind <- 1
     for (i in 1:numb_false_alph) {
       false_alph[[i]] <- numb_alph + ind:(ind + err_num_alph[i] - 1)
-      ind <- ind + err_numb_alph[i]
+      ind <- ind + err_num_alph[i]
     }
     for (i in 1:numb_false_beta) {
       false_beta[[i]] <- numb_beta + ind:(ind + err_num_beta[i] - 1)
-      ind <- ind + err_numb_beta[i]
+      ind <- ind + err_num_beta[i]
     }
   } else {
     stop("Invalid error model specification. Choose either 'constant' or 'lognormal'")
@@ -145,6 +145,7 @@ create_data <- function(TCR, plates = 5, error_drop = c(.15, .01),
           }
       }
       # col 2 of samp beta has the drop rate; beta_i isn't dropped when runif > err
+      samp_beta <- samp_beta[!is.na(samp_beta[, 1]), ]
       samp_beta <- samp_beta[runif(nrow(samp_beta)) > samp_beta[, 2], 1]
 
       samp_alph <- matrix(nrow = 2 * nrow(samp_clones), ncol = 2)
@@ -157,10 +158,11 @@ create_data <- function(TCR, plates = 5, error_drop = c(.15, .01),
           ind <- ind + 2
         } else {
           samp_alph[ind, 1] <- samp_clones[i, 3]
-          samp_alph[ind, 2] <- samp_clones[i, 4]
+          samp_alph[ind, 2] <- samp_clones[i, 5]
           ind <- ind + 1
         }
       }
+      samp_alph <- samp_alph[!is.na(samp_alph[, 1]), ]
       samp_alph <- samp_alph[runif(nrow(samp_alph)) > samp_alph[, 2], 1]
 
       switch_alph <- which(runif(length(samp_alph)) < err_seq_alph[samp_alph])

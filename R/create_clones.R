@@ -35,7 +35,7 @@
 #'                               beta_sharing = c(0.75, 0.20, 0.05))
 #'
 #' @export
-create_clones_dual <- function(numb_beta = 1000, dual_beta = 0, dual_alpha = 0.3, alpha_sharing, beta_sharing) {
+create_clones <- function(numb_beta = 1000, dual_beta = 0, dual_alpha = 0.3, alpha_sharing, beta_sharing) {
   # sharing for paper:
   # alpha_sharing = c(.816, .085, .021, .007, .033, .005, .033)
   # beta_sharing = c(.859, .076, .037, .019, .009)
