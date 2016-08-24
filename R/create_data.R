@@ -15,15 +15,15 @@ create_data <- function(TCR, plates = 5, error_drop = c(.15, .01),
   # The sampling is done by sampling indices from a skewed distribution, and then choosing the corresponding clone/row from the input data; the input data should already have the clones in random order
   # linear distribution: first n clones repesent 50%, p_k = p0 - k * step
   if (dist == "linear") {
-    last_term <- (1 - prop_top)/(numb_clones - skewed) * 1.1
+    last_term <- (1 - prop_top) / (numb_clones - skewed) * 1.1
     lhs11 <- 1
     lhs12 <- skewed - 1
     lhs21 <- (1 + skewed - 1)
-    lhs22 <- (skewed - 1)/2 + (skewed - 1)^2/2
+    lhs22 <- (skewed - 1) / 2 + (skewed - 1) ^ 2 / 2
     A <- matrix(c(lhs11, lhs21, lhs12, lhs22), nrow = 2)
     b <- matrix(c(last_term, prop_top), nrow = 2)
     solveAb <- solve(A,b)
-    prob1 <- solveAb[1] + 0:(skewed-1) * solveAb[2]
+    prob1 <- solveAb[1] + 0:(skewed - 1) * solveAb[2]
     prob2 <- rep((1 - prop_top)/(numb_clones - skewed), numb_clones - skewed)
     dist_vector <- c(prob1, prob2)
   }
@@ -59,19 +59,25 @@ create_data <- function(TCR, plates = 5, error_drop = c(.15, .01),
     stop("Invalid error model specification. Choose either 'constant' or 'lognormal'")
   }
 
-
-  err_seq <- error[2]
-
-  err_seq_alph <- vector(length = numb_alph)
-  err_seq_beta <- vector(length = numb_beta)
-  err_num_alph <- vector(length = numb_alph)
-  err_num_beta <- vector(length = numb_beta)
-
   if (error_mode[2] == "constant") {
     err_seq_alph <- rep(error_seq[1],  numb_alph)
     err_seq_beta <- rep(error_seq[1],  numb_beta)
     err_num_alph <- rep(2,  numb_alph)
     err_num_beta <- rep(2,  numb_beta)
+
+    numb_false_alph <- sum(err_numb_alph)
+    numb_false_beta <- sum(err_numb_beta)
+
+    false_alph <- vector(mode = "list", length = numb_false_alph)
+    false_beta <- vector(mode = "list", length = numb_false_beta)
+
+    for (i in 1:numb_false_alph) {
+      false_alph[[i]] <- numb_alph + (2 * i - 1):(2 * i)
+    }
+    for (i in 1:numb_false_beta) {
+      false_beta[[i]] <- numb_beta + (2 * i - 1):(2 * i)
+    }
+
   } else if (error_mode[2] == "lognormal") {
     # input mean and sd of the error drop rates
     err_mean <- error_seq[1]
@@ -83,7 +89,24 @@ create_data <- function(TCR, plates = 5, error_drop = c(.15, .01),
 
     err_seq_alph <- rlnorm(numb_alph, meanlog = mu, sdlog = sd)
     err_seq_beta <- rlnorm(numb_beta, meanlog = mu, sdlog = sd)
+    err_num_alph <- sample(1:4, length = numb_alph)
+    err_num_beta <- sample(1:4, length = numb_beta)
 
+    numb_false_alph <- sum(err_numb_alph)
+    numb_false_beta <- sum(err_numb_beta)
+
+    false_alph <- vector(mode = "list", length = numb_false_alph)
+    false_beta <- vector(mode = "list", length = numb_false_beta)
+
+    ind <- 1
+    for (i in 1:numb_false_alph) {
+      false_alph[[i]] <- numb_alph + ind:(ind + err_num_alph[i] - 1)
+      ind <- ind + err_numb_alph[i]
+    }
+    for (i in 1:numb_false_beta) {
+      false_beta[[i]] <- numb_beta + ind:(ind + err_num_beta[i] - 1)
+      ind <- ind + err_numb_beta[i]
+    }
   } else {
     stop("Invalid error model specification. Choose either 'constant' or 'lognormal'")
   }
@@ -94,8 +117,8 @@ create_data <- function(TCR, plates = 5, error_drop = c(.15, .01),
   # Create a matrix to represent which chains are present in which well
   # Entry (i, j) = 0 if chain j is not present in well i, (i,j) = 1 if chain j
   # is present in well i
-  data_alph <- matrix(0, nrow = wells, ncol = numb_alph)
-  data_beta <- matrix(0, nrow = wells, ncol = numb_beta)
+  data_alph <- matrix(0, nrow = wells, ncol = numb_alph + numb_false_alph)
+  data_beta <- matrix(0, nrow = wells, ncol = numb_beta + numb_false_beta)
 
   distinct_ss <- numb_cells[, 1]  # vector of the distinct sample sizes in well
   ind_well <- 1                   # index of well we will be sampling cells into
@@ -138,13 +161,22 @@ create_data <- function(TCR, plates = 5, error_drop = c(.15, .01),
           ind <- ind + 1
         }
       }
-      # col 2 of samp beta has the drop rate; beta_i isn't dropped when runif > err
       samp_alph <- samp_alph[runif(nrow(samp_alph)) > samp_alph[, 2], 1]
 
-      alph_drop <- rep(samp_clones[, 4], each = 2)
+      switch_alph <- which(runif(length(samp_alph)) < err_seq_alph[samp_alph])
+      for (a in switch_alph) {
+        ind_alph <- samp_alph[a]
+        samp_alph[a] <- sample(false_alph[[ind_alph]], size = 1)
+      }
 
-      for (x in choice_alph)  if(runif(1) > error) data_alph[ind_well, x] <- 1
-      for (x in choice_beta)  if(runif(1) > error) data_beta[ind_well, x] <- 1
+      switch_beta <- which(runif(length(samp_beta)) < err_seq_beta[samp_beta])
+      for (b in switch_beta) {
+        ind_beta <- samp_beta[b]
+        samp_beta[b] <- sample(false_beta[[ind_beta]], size = 1)
+      }
+
+      data_alph[ind_well, samp_alph] <- 1
+      data_beta[ind_well, samp_beta] <- 1
 
       # Internal QA controls
       # sample_sizes[rand] <- sample_sizes[rand] + 1
