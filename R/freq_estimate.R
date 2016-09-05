@@ -49,16 +49,16 @@ freq_estimate <- function(alpha, beta, pair, error = .15, cells) {
   if(nrow(beta) != numb_wells)
     stop("Different number of wells in alpha and beta data sets")
   numb_plates <- numb_wells / 96
-  if (ncol(pair) != 5) stop("The pair argument should be a 5 col matrix, first
-                              2 col for betas, next 2 col for alphas, and 5th col
-                            for proportion of replicates. Update alphabetr if
-                            bagpipe() isn't outputting this format.")
+  # if (all(names(pair)[1:4] != c("beta1", "beta2", "alpha1", "alpha2")) | ncol(pairs) == 5)
+  #   stop("The pair argument should be a 5 col matrix, first 2 col for betas,
+  # next 2 col for alphas, and 5th col for proportion of replicates.
+  # Update alphabetr if bagpipe() isn't outputting this format.")
 
   # Find the number of unique alpha and beta chains
   numb_alph <- ncol(alpha)
   numb_beta <- ncol(beta)
 
-  freq_results <- matrix(0, nrow = nrow(pair), ncol = 8)         # preallocating matrix to record results
+  freq_results <- matrix(0, nrow = nrow(pair), ncol = 9)         # preallocating matrix to record results
 
   for (clone in 1:nrow(pair)) {
     # indices of the chains of the clone
@@ -130,7 +130,6 @@ freq_estimate <- function(alpha, beta, pair, error = .15, cells) {
       if (unbound_ci) {
         CI.lower <- 0
       } else {
-        # browser()
         if (ci_single(1e-16, mle) * mle$minimum < 0) {
           CI_lower <- uniroot(ci_single, MLE = mle, lower = 1e-16,
                               upper = mle$minimum, tol = .Machine$double.eps)
@@ -140,30 +139,32 @@ freq_estimate <- function(alpha, beta, pair, error = .15, cells) {
           CI_lower <- 0
         }
       }
-      freq_results[clone, 1] <- ind_beta
-      freq_results[clone, 2] <- ind_alph1
-      freq_results[clone, 3] <- ind_alph2
-      freq_results[clone, 4] <- mle$minimum
-      freq_results[clone, 5] <- CI_upper
-      freq_results[clone, 6] <- CI_lower
-      freq_results[clone, 7] <- CI_upper - CI_lower
+      freq_results[clone, 1] <- ind_beta1
+      freq_results[clone, 2] <- ind_beta2
+      freq_results[clone, 3] <- ind_alph1
+      freq_results[clone, 4] <- ind_alph2
+      freq_results[clone, 5] <- mle$minimum
+      freq_results[clone, 6] <- CI_upper
+      freq_results[clone, 7] <- CI_lower
+      freq_results[clone, 8] <- CI_upper - CI_lower
       if (ind_alph1 == ind_alph2) {
-        freq_results[clone, 8] <- pair[clone, 5]
+        freq_results[clone, 9] <- pair[clone, 5]
       } else {
-        freq_results[clone, 8] <- -1
+        freq_results[clone, 9] <- -1
       }
     } else {
       freq_results[clone, 1] <- ind_beta
-      freq_results[clone, 2] <- ind_alph1
-      freq_results[clone, 3] <- ind_alph2
-      freq_results[clone, 4] <- NA
+      freq_results[clone, 2] <- ind_beta
+      freq_results[clone, 3] <- ind_alph1
+      freq_results[clone, 4] <- ind_alph2
       freq_results[clone, 5] <- NA
       freq_results[clone, 6] <- NA
       freq_results[clone, 7] <- NA
+      freq_results[clone, 8] <- NA
       if (dual_alpha | dual_beta) {
-        freq_results[clone, 8] <- pair[clone, 5]
+        freq_results[clone, 9] <- pair[clone, 5]
       } else {
-        freq_results[clone, 8] <- -1
+        freq_results[clone, 9] <- -1
       }
     }
     colnames(freq_results) <- c("beta1", "beta2", "alpha1", "alpha2",
