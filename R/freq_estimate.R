@@ -97,7 +97,7 @@ freq_estimate <- function(alpha, beta, pair, error = .15, cells) {
     # calculating the MLE for the frequency point estimate
     # a different C++ function is called depending on what chain(s) are duals
     if (dual_alph & dual_beta & !all_wells) {
-      mle <- optimize(likelihood_dual_dual, interval = c(0, .5), maximum = FALSE,
+      mle <- optimize(likelihood_dualdual, interval = c(0, .5), maximum = FALSE,
                       err = error, numb_wells = well_clone,
                       numb_cells = sample_size_well, numb_sample = numb_sample)
     } else if (dual_alph & !dual_beta & !all_wells) {
