@@ -44,10 +44,11 @@ bagpipe <- function(alpha, beta, replicates = 100, frac = 0.75,
                     thres = c(.3, .6, .9), bootstrap = FALSE) {
   # If user asks for bootstrapping, then the resampled size must be equal
   # to the original sample size
-  if(bootstrap == TRUE) frac <- 1.0
+  if (bootstrap == TRUE) frac <- 1.0
   # Ensure that there are the same number of wells in the alpha and beta data
-  if(nrow(alpha) != nrow(beta))
+  if (nrow(alpha) != nrow(beta))
     stop("Different number of wells in the alpha and beta data inputs.")
+  if (replicates < 1) stop("The replicates arguments need to be at least 1.")
 
   numb_plates <- nrow(alpha) / 96
   size_rep    <- floor(frac * nrow(alpha))  # number of wells to sample
@@ -162,7 +163,7 @@ bagpipe <- function(alpha, beta, replicates = 100, frac = 0.75,
     }
   }
 
-  jack_results <- jack_results[, c(1, 2, 2, 3), drop = FALSE]
-  colnames(jack_results) <- c("beta", "alpha1", "alpha2", "prop_replicates")
+  jack_results <- jack_results[, c(1, 1, 2, 2, 3), drop = FALSE]
+  colnames(jack_results) <- c("beta1", "beta2", "alpha1", "alpha2", "prop_replicates")
   jack_results
 } # end function

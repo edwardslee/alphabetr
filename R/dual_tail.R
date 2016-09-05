@@ -29,8 +29,10 @@ dual_tail <- function(alpha, beta, freq_results, cells, population) {
     # preallocate matrix to record the expected
     # col 1: beta index,      col 2: alpha1,             col 3: alpha2
     # col 4: expt # of wells, col 5: actual # of wells
-    rec <- matrix(nrow = 0, ncol = 5)
-    colnames(rec) <- c("beta", "alpha1", "alpha2", "expt_wells", "act_wells")
+    rec <- matrix(nrow = 0, ncol = 6)
+    colnames(rec) <- c("beta1", "beta2",
+                       "alpha1", "alpha2",
+                       "expt_wells", "act_wells")
 
     # checking the clones with each beta chain
     #   -calculate the expected number of plates for every pair of alpha associated
@@ -38,7 +40,7 @@ dual_tail <- function(alpha, beta, freq_results, cells, population) {
     #   -if beta, alpha_k1, alpha_k2 show up more often than expected, then they
     #       must be dual
     for (clon in 1:max_beta) {
-      x <- freq[freq[, "beta"] == clon, , drop = FALSE]  # find clones with the beta index
+      x <- freq[freq[, "beta1"] == clon, , drop = FALSE]  # find clones with the beta index
       numb_cand <- nrow(x)                            # find number of alphas associated with beta
       if (numb_cand > 1) {                            # if more than 1 alpha
         combos <- combn(numb_cand, 2)                   # find all combos of pairs
@@ -57,23 +59,23 @@ dual_tail <- function(alpha, beta, freq_results, cells, population) {
           dat_plates <- sum(data_beta[, clon] == 1 &
                               data_alph[, alpha1] == 1 &
                               data_alph[, alpha2] == 1)
-          rec <- rbind(rec, c(clon, alpha1, alpha2, exp_plates, dat_plates))
+          rec <- rbind(rec, c(clon, clon, alpha1, alpha2, exp_plates, dat_plates))
         }
       }
     } # end for going through all beta chains
 
-    rec_tail <<- rec
+    rec_tail <- rec
     if (nrow(rec) > 2) {
       # make decisions on if two clones are independent or actually a dual TCR by
       # looking at the ratio of actual # of wells vs expected # of wells
       # -do this by clustering the ratios into "high" and "low" ratios using k-means
       # -the "high" cluster are more likely to be duals
-      well_ratio <- rec[, 5]/rec[, 4]                   # ratio of actual to expected
+      well_ratio <- rec[, "act_wells"]/rec[, "expt_wells"] # ratio of actual to expected
       if (length(unique(well_ratio)) > 1) {
-        km_out <- kmeans(well_ratio, 2, nstart = 200)     # kmeans of ratios in 2 clusters
+        km_out <- kmeans(well_ratio, 2, nstart = 200)      # kmeans of ratios in 2 clusters
         # figure out which cluster represents "high"
-        clus_ind1 <- which(km_out$cluster == 1)           # one cluster
-        clus_ind2 <- which(km_out$cluster == 2)           # the other cluster
+        clus_ind1 <- which(km_out$cluster == 1)            # one cluster
+        clus_ind2 <- which(km_out$cluster == 2)            # the other cluster
         # determine which cluster has the higher ratios, making it "high" cluster
         if (mean(well_ratio[clus_ind1]) > mean(well_ratio[clus_ind2])) {
           clus_ind <- clus_ind1
@@ -94,8 +96,8 @@ dual_tail <- function(alpha, beta, freq_results, cells, population) {
   # perform the dual discrimination for the tail
   tail_dual <- dual_procedure(alpha, beta, freq_results, cells)
   tail_rec <- tail_dual$results
-  tail_rec <- tail_rec[tail_dual$cluster, 1:3, drop = FALSE]
+  tail_rec <- tail_rec[tail_dual$cluster, 1:4, drop = FALSE]
 
-  colnames(tail_rec) <- c("beta", "alpha1", "alpha2")
+  colnames(tail_rec) <- c("beta1", "beta2", "alpha1", "alpha2")
   as.data.frame(tail_rec)
 }
