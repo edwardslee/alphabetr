@@ -76,8 +76,8 @@ freq_estimate <- function(alpha, beta, pair, error = .15, cells) {
     well_clone <- rep(0, numb_distinct)
 
     # logicals whether the clone has dual alphas and/or dual betas
-    dual_alph <- ind_alph1 == ind_alph2
-    dual_beta <- ind_beta1 == ind_beta2
+    dual_alph <- ind_alph1 != ind_alph2
+    dual_beta <- ind_beta1 != ind_beta2
 
     # determining the number of wells of each sample size that all chains appear in
     for (size in 1:numb_distinct) {
@@ -147,21 +147,21 @@ freq_estimate <- function(alpha, beta, pair, error = .15, cells) {
       freq_results[clone, 6] <- CI_upper
       freq_results[clone, 7] <- CI_lower
       freq_results[clone, 8] <- CI_upper - CI_lower
-      if (ind_alph1 == ind_alph2) {
+      if (!dual_alph & !dual_beta) {
         freq_results[clone, 9] <- pair[clone, 5]
       } else {
         freq_results[clone, 9] <- -1
       }
     } else {
-      freq_results[clone, 1] <- ind_beta
-      freq_results[clone, 2] <- ind_beta
+      freq_results[clone, 1] <- ind_beta1
+      freq_results[clone, 2] <- ind_beta2
       freq_results[clone, 3] <- ind_alph1
       freq_results[clone, 4] <- ind_alph2
       freq_results[clone, 5] <- NA
       freq_results[clone, 6] <- NA
       freq_results[clone, 7] <- NA
       freq_results[clone, 8] <- NA
-      if (dual_alpha | dual_beta) {
+      if (!dual_alph & !dual_beta) {
         freq_results[clone, 9] <- pair[clone, 5]
       } else {
         freq_results[clone, 9] <- -1
