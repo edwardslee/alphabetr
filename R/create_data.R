@@ -95,18 +95,20 @@ create_data <- function(TCR, plates = 5, error_drop = c(.15, .01),
     numb_false_alph <- sum(err_num_alph)
     numb_false_beta <- sum(err_num_beta)
 
-    false_alph <- vector(mode = "list", length = numb_false_alph)
-    false_beta <- vector(mode = "list", length = numb_false_beta)
+    false_alph <- vector(mode = "list", length = numb_alph)
+    false_beta <- vector(mode = "list", length = numb_beta)
 
     ind <- 1
-    for (i in 1:numb_false_alph) {
+    for (i in 1:numb_alph) {
       false_alph[[i]] <- numb_alph + ind:(ind + err_num_alph[i] - 1)
       ind <- ind + err_num_alph[i]
     }
-    for (i in 1:numb_false_beta) {
+    ind <- 1
+    for (i in 1:numb_beta) {
       false_beta[[i]] <- numb_beta + ind:(ind + err_num_beta[i] - 1)
       ind <- ind + err_num_beta[i]
     }
+
   } else {
     stop("Invalid error model specification. Choose either 'constant' or 'lognormal'")
   }
