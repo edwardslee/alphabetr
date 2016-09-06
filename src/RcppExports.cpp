@@ -52,6 +52,21 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// likelihood_dualdual
+double likelihood_dualdual(double est, double err, NumericVector numb_wells, NumericVector numb_cells, NumericVector numb_sample);
+RcppExport SEXP alphabetr_likelihood_dualdual(SEXP estSEXP, SEXP errSEXP, SEXP numb_wellsSEXP, SEXP numb_cellsSEXP, SEXP numb_sampleSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< double >::type est(estSEXP);
+    Rcpp::traits::input_parameter< double >::type err(errSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type numb_wells(numb_wellsSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type numb_cells(numb_cellsSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type numb_sample(numb_sampleSEXP);
+    __result = Rcpp::wrap(likelihood_dualdual(est, err, numb_wells, numb_cells, numb_sample));
+    return __result;
+END_RCPP
+}
 // likelihood_single
 double likelihood_single(double est, double err, NumericVector numb_wells, NumericVector numb_cells, NumericVector numb_sample);
 RcppExport SEXP alphabetr_likelihood_single(SEXP estSEXP, SEXP errSEXP, SEXP numb_wellsSEXP, SEXP numb_cellsSEXP, SEXP numb_sampleSEXP) {

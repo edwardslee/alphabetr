@@ -51,7 +51,7 @@ dual_top <- function(alpha, beta, pair, error, cells) {
   freq <- freq[!is.na(freq[, "MLE"]), ]
   for (clon in 1:max_beta) {
     # browser()
-    x <- freq[freq[, "beta"] == clon, , drop = FALSE]  # find clones with the beta index
+    x <- freq[freq[, "beta1"] == clon, , drop = FALSE]  # find clones with the beta index
     numb_cand <- nrow(x)                            # find number of alphas associated with beta
     if (numb_cand > 1) {                            # if more than 1 alpha
       combos <- combn(numb_cand, 2)                   # find all combos of pairs
@@ -132,6 +132,6 @@ dual_top <- function(alpha, beta, pair, error, cells) {
   filt_rec <- dplyr::filter(rec, diff > 10)
   filt_rec <- dplyr::filter(filt_rec, shared_LL > 40 & shared_LL < 100)
 
-  filt_rec[, 1:3, drop = FALSE]
+  filt_rec[, c(1, 1:3), drop = FALSE]
 
 }

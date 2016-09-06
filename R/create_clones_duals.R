@@ -31,11 +31,11 @@
 #'    # clones; 80% alpha chains shared by one clone, 15% by two clones, and 5%
 #'    # by three clones
 #'    TCR_pairings <- create_clones(numb_beta = 1000, dual = .3,
-#'                                  alpha_sharing = c(0.80, 0.15, 0.05),
-#'                                  beta_sharing  = c(0.75, 0.20, 0.05))
+#'                               alpha_sharing = c(0.80, 0.15, 0.05),
+#'                               beta_sharing = c(0.75, 0.20, 0.05))
 #'
 #' @export
-create_clones <- function(numb_beta = 1000, dual_beta = 0, dual_alpha = 0.3, alpha_sharing, beta_sharing) {
+create_clones_dual <- function(numb_beta = 1000, dual_beta = 0, dual_alpha = 0.3, alpha_sharing, beta_sharing) {
   # sharing for paper:
   # alpha_sharing = c(.816, .085, .021, .007, .033, .005, .033)
   # beta_sharing = c(.859, .076, .037, .019, .009)
@@ -47,14 +47,11 @@ create_clones <- function(numb_beta = 1000, dual_beta = 0, dual_alpha = 0.3, alp
   if (length(beta_sharing) == 0 | any(is.na(beta_sharing)) | any(beta_sharing < 0)){
     stop("Please include a valid beta chain sharing vector")
   }
-  if (sum(alpha_sharing) != 1) {
+  if(sum(alpha_sharing) != 1) {
     stop("Alpha sharing proportion do not add up to 100%")
   }
-  if (sum(beta_sharing) != 1) {
+  if(sum(beta_sharing) != 1) {
     stop("Beta sharing proportion do not add up to 100%")
-  }
-  if (length(numb_beta) != 1) {
-    stop("Length of the numb_beta argument must be 1")
   }
 
   if (length(alpha_sharing) < 7) {
@@ -145,11 +142,11 @@ create_clones <- function(numb_beta = 1000, dual_beta = 0, dual_alpha = 0.3, alp
   n_alph7 <- floor(alpha_sharing[7] * numb_alph)
 
   n_alph1   <- numb_alph_used - (2 * n_alph2 + 3 * n_alph3 +
-                                   4 * n_alph4 + 5 * n_alph5 +
-                                   5 * n_alph6 + 7 * n_alph7)
+                                 4 * n_alph4 + 5 * n_alph5 +
+                                 5 * n_alph6 + 7 * n_alph7)
 
   numb_alph <- n_alph1 + n_alph2 + n_alph3 + n_alph4 +
-    n_alph5 + n_alph6 + n_alph7
+               n_alph5 + n_alph6 + n_alph7
 
   # this vector will randomly allocate the # of clones sharing a beta chain
   clones_per_alph <- sample(c(rep(1, n_alph1),
@@ -203,6 +200,14 @@ create_clones <- function(numb_beta = 1000, dual_beta = 0, dual_alpha = 0.3, alp
       ind_clones <- ind_clones + 1
     }
   }
+
+
+
+
+
+
+
+
 
   ordered   <- clones[order(clones[, 1], decreasing = FALSE), ]
   dual_alph <- clones[clones[, 3] != clones[, 4], ]

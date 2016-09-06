@@ -1,23 +1,23 @@
 #' @export
 dual_eval <- function(duals, pair, TCR_sizes, number_skewed, TCR_dual) {
   # determine top (common) duals and tail (rare) duals
-  dual_top <- TCR_sizes[which(TCR_sizes[1:number_skewed, 2] != TCR_sizes[1:number_skewed, 3]), , drop = FALSE]
+  dual_top <- TCR_sizes[which(TCR_sizes[1:number_skewed, 3] != TCR_sizes[1:number_skewed, 4]), , drop = FALSE]
 
   # record the top dual indices, remove them to get the dual tail indices
   indices_dual <- vector(length = nrow(dual_top))
   for (i in 1:nrow(dual_top)) {
-    ind_beta  <- dual_top[i, 1]
-    ind_alph1 <- dual_top[i, 2]
-    ind_alph2 <- dual_top[i, 3]
+    ind_beta  <- dual_top[i, "beta1"]
+    ind_alph1 <- dual_top[i, "alpha1"]
+    ind_alph2 <- dual_top[i, "alpha2"]
     indices_dual[i] <- which(TCR_dual[, 1] == ind_beta &
-                               ((TCR_dual[, 2] == ind_alph1 & TCR_dual[, 3] == ind_alph2) |
-                                  (TCR_dual[, 2] == ind_alph2 & TCR_dual[, 3] == ind_alph1))
+                               ((TCR_dual[, 3] == ind_alph1 & TCR_dual[, 4] == ind_alph2) |
+                                (TCR_dual[, 3] == ind_alph2 & TCR_dual[, 4] == ind_alph1))
     )
   } # end for - i; remove dual clones
   dual_tail <- TCR_dual[-indices_dual, ]    # remove top duals, leaving the tail
 
   # if the freq estimation fails, then can't do the dual thing
-  unest_pairs <- pair[is.na(pair[, "MLE"]), 1:3]
+  unest_pairs <- pair[is.na(pair[, "MLE"]), 1:4]
 
   tail_dual_record <<- matrix(nrow = 0, ncol = 3)
   if (nrow(duals) > 0) { # if any duals are determined
@@ -28,17 +28,17 @@ dual_eval <- function(duals, pair, TCR_sizes, number_skewed, TCR_dual) {
 
     for (i in 1:nrow(duals)) {
       ind_beta  <- duals[i, 1]
-      ind_alph1 <- duals[i, 2]
-      ind_alph2 <- duals[i, 3]
+      ind_alph1 <- duals[i, 3]
+      ind_alph2 <- duals[i, 4]
 
       # check if clone is a top dual; need to match beta and both alphas
       top_cond  <- any(dual_top[, 1] == ind_beta &
-                         ((dual_top[, 2] == ind_alph1 & dual_top[, 3] == ind_alph2) |
-                            (dual_top[, 2] == ind_alph2 & dual_top[, 3] == ind_alph1)))
+                         ((dual_top[, 3] == ind_alph1 & dual_top[, 4] == ind_alph2) |
+                          (dual_top[, 3] == ind_alph2 & dual_top[, 4] == ind_alph1)))
       # check if clone is a tail dual; need to match beta and both alphas
       tail_cond <- any(dual_tail[, 1] == ind_beta &
-                         ((dual_tail[, 2] == ind_alph1 & dual_tail[, 3] == ind_alph2) |
-                            (dual_tail[, 2] == ind_alph2 & dual_tail[, 3] == ind_alph1)))
+                         ((dual_tail[, 3] == ind_alph1 & dual_tail[, 4] == ind_alph2) |
+                          (dual_tail[, 3] == ind_alph2 & dual_tail[, 4] == ind_alph1)))
 
       if (top_cond)  numb_correct_top  <- numb_correct_top + 1
       if (tail_cond) {
@@ -58,15 +58,15 @@ dual_eval <- function(duals, pair, TCR_sizes, number_skewed, TCR_dual) {
 
     for (i in 1:nrow(dual_top)) {
       ind_beta  <- dual_top[i, 1]
-      ind_alph1 <- dual_top[i, 2]
-      ind_alph2 <- dual_top[i, 3]
+      ind_alph1 <- dual_top[i, 3]
+      ind_alph2 <- dual_top[i, 4]
 
-      if (any(pair[, 1] == ind_beta & pair[, 2] == ind_alph1) &
-          any(pair[, 1] == ind_beta & pair[, 3] == ind_alph2)) {
+      if (any(pair[, 1] == ind_beta & pair[, 3] == ind_alph1) &
+          any(pair[, 1] == ind_beta & pair[, 4] == ind_alph2)) {
         numb_poss_top <- numb_poss_top + 1
         # then check to see if the top dual has any unestimateable freq
-        if (any(unest_pairs[, 1] == ind_beta & unest_pairs[, 2] == ind_alph1) |
-            any(unest_pairs[, 1] == ind_beta & unest_pairs[, 2] == ind_alph2)) {
+        if (any(unest_pairs[, 1] == ind_beta & unest_pairs[, 3] == ind_alph1) |
+            any(unest_pairs[, 1] == ind_beta & unest_pairs[, 3] == ind_alph2)) {
           numb_unest_top <- numb_unest_top + 1
         }
       }
@@ -74,15 +74,15 @@ dual_eval <- function(duals, pair, TCR_sizes, number_skewed, TCR_dual) {
 
     for (i in 1:nrow(dual_tail)) {
       ind_beta  <- dual_tail[i, 1]
-      ind_alph1 <- dual_tail[i, 2]
-      ind_alph2 <- dual_tail[i, 3]
+      ind_alph1 <- dual_tail[i, 3]
+      ind_alph2 <- dual_tail[i, 4]
 
-      if (any(pair[, 1] == ind_beta & pair[, 2] == ind_alph1) &
-          any(pair[, 1] == ind_beta & pair[, 3] == ind_alph2)) {
+      if (any(pair[, 1] == ind_beta & pair[, 3] == ind_alph1) &
+          any(pair[, 1] == ind_beta & pair[, 4] == ind_alph2)) {
         numb_poss_tail <- numb_poss_tail + 1
         # then check to see if the top dual has any unestimateable freq
-        if (any(unest_pairs[, 1] == ind_beta & unest_pairs[, 2] == ind_alph1) |
-            any(unest_pairs[, 1] == ind_beta & unest_pairs[, 2] == ind_alph2)) {
+        if (any(unest_pairs[, 1] == ind_beta & unest_pairs[, 3] == ind_alph1) |
+            any(unest_pairs[, 1] == ind_beta & unest_pairs[, 3] == ind_alph2)) {
           numb_unest_tail <- numb_unest_tail + 1
         }
       }
@@ -131,16 +131,16 @@ dual_eval <- function(duals, pair, TCR_sizes, number_skewed, TCR_dual) {
 
     for (i in 1:nrow(dual_top)) {
       ind_beta  <- TCR_dual[i, 1]
-      ind_alph1 <- TCR_dual[i, 2]
-      ind_alph2 <- TCR_dual[i, 3]
+      ind_alph1 <- TCR_dual[i, 3]
+      ind_alph2 <- TCR_dual[i, 4]
 
       # check if these indices represent a top dual
       if (any(dual_top[, 1] == ind_beta & dual_top[, 2] == ind_alph1) &
           any(dual_top[, 1] == ind_beta & dual_top[, 3] == ind_alph2)) {
         numb_poss_top <- numb_poss_top + 1
         # then check to see if the top dual has any unestimateable freq
-        if (any(unest_pairs[, 1] == ind_beta & unest_pairs[, 2] == ind_alph1) |
-            any(unest_pairs[, 1] == ind_beta & unest_pairs[, 2] == ind_alph2)) {
+        if (any(unest_pairs[, 1] == ind_beta & unest_pairs[, 3] == ind_alph1) |
+            any(unest_pairs[, 1] == ind_beta & unest_pairs[, 3] == ind_alph2)) {
           numb_unest_top <- numb_unest_top + 1
         }
       }
@@ -150,8 +150,8 @@ dual_eval <- function(duals, pair, TCR_sizes, number_skewed, TCR_dual) {
           any(dual_tail[, 1] == ind_beta & dual_tail[, 3] == ind_alph2)) {
         numb_poss_tail <- numb_poss_tail + 1
         # then check to see if the top dual has any unestimateable freq
-        if (any(unest_pairs[, 1] == ind_beta & unest_pairs[, 2] == ind_alph1) |
-            any(unest_pairs[, 1] == ind_beta & unest_pairs[, 2] == ind_alph2)) {
+        if (any(unest_pairs[, 1] == ind_beta & unest_pairs[, 3] == ind_alph1) |
+            any(unest_pairs[, 1] == ind_beta & unest_pairs[, 3] == ind_alph2)) {
           numb_unest_tail <- numb_unest_tail + 1
         }
       }

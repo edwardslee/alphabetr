@@ -50,6 +50,19 @@ likelihood_dual <- function(est, err, numb_wells, numb_cells, numb_sample) {
 #' @param numb_sample a
 #'
 #' @export
+likelihood_dualdual <- function(est, err, numb_wells, numb_cells, numb_sample) {
+    .Call('alphabetr_likelihood_dualdual', PACKAGE = 'alphabetr', est, err, numb_wells, numb_cells, numb_sample)
+}
+
+#' Calculate likelihood of a single TCR clone
+#'
+#' @param est a
+#' @param err a
+#' @param numb_cells a
+#' @param numb_wells a
+#' @param numb_sample a
+#'
+#' @export
 likelihood_single <- function(est, err, numb_wells, numb_cells, numb_sample) {
     .Call('alphabetr_likelihood_single', PACKAGE = 'alphabetr', est, err, numb_wells, numb_cells, numb_sample)
 }

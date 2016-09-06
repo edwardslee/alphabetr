@@ -49,18 +49,23 @@ freq_estimate <- function(alpha, beta, pair, error = .15, cells) {
   if(nrow(beta) != numb_wells)
     stop("Different number of wells in alpha and beta data sets")
   numb_plates <- numb_wells / 96
+  # if (all(names(pair)[1:4] != c("beta1", "beta2", "alpha1", "alpha2")) | ncol(pairs) == 5)
+  #   stop("The pair argument should be a 5 col matrix, first 2 col for betas,
+  # next 2 col for alphas, and 5th col for proportion of replicates.
+  # Update alphabetr if bagpipe() isn't outputting this format.")
 
   # Find the number of unique alpha and beta chains
   numb_alph <- ncol(alpha)
   numb_beta <- ncol(beta)
 
-  abundance.results <- matrix(0, nrow = nrow(pair), ncol = 8)         # preallocating matrix to record results
+  freq_results <- matrix(0, nrow = nrow(pair), ncol = 9)         # preallocating matrix to record results
 
   for (clone in 1:nrow(pair)) {
     # indices of the chains of the clone
-    ind_beta  <- pair[clone, 1]
-    ind_alph1 <- pair[clone, 2]
-    ind_alph2 <- pair[clone, 3]
+    ind_beta1 <- pair[clone, 1]
+    ind_beta2 <- pair[clone, 2]
+    ind_alph1 <- pair[clone, 3]
+    ind_alph2 <- pair[clone, 4]
 
     # Determing which wells that contain the clone a clone is counted to be in a
     # well if their component chains are found in the same well
@@ -69,32 +74,42 @@ freq_estimate <- function(alpha, beta, pair, error = .15, cells) {
 
     numb_distinct <- length(sample_size_well)
     well_clone <- rep(0, numb_distinct)
-    if (ind_alph1 == ind_alph2 || ncol(pair) == 3) {
-      for (size in 1:numb_distinct) {
-        ind1 <- cumsum(numb_sample[1:size])[size] - numb_sample[size] + 1
-        ind2 <- cumsum(numb_sample[1:size])[size]
-        well_clone[size] <- sum(beta[ind1:ind2, ind_beta] == 1 &
-                                alpha[ind1:ind2, ind_alph1] == 1)
-      }
-    } else {
-      for (size in 1:numb_distinct) {
-        ind1 <- cumsum(numb_sample[1:size])[size] - numb_sample[size] + 1
-        ind2 <- cumsum(numb_sample[1:size])[size]
-        well_clone[size] <- sum(beta[ind1:ind2, ind_beta] == 1 &
-                                  alpha[ind1:ind2, ind_alph1] == 1 &
-                                  alpha[ind1:ind2, ind_alph2] == 1)
-      }
+
+    # logicals whether the clone has dual alphas and/or dual betas
+    dual_alph <- ind_alph1 != ind_alph2
+    dual_beta <- ind_beta1 != ind_beta2
+
+    # determining the number of wells of each sample size that all chains appear in
+    for (size in 1:numb_distinct) {
+      ind1 <- cumsum(numb_sample[1:size])[size] - numb_sample[size] + 1
+      ind2 <- cumsum(numb_sample[1:size])[size]
+      well_clone[size] <- sum(beta[ind1:ind2, ind_beta1]  == 1 &
+                              beta[ind1:ind2, ind_beta2]  == 1 &
+                              alpha[ind1:ind2, ind_alph1] == 1 &
+                              alpha[ind1:ind2, ind_alph2] == 1)
     }
 
-
+    # checking to see if all the clones' chains appear in all of the wells;
+    # method falls apart when this occurs and # of cells in wells will need to
+    # be reduced in a future experiment in estimate these clones
     all_wells <- sum(well_clone) == nrow(alpha)
 
-    if ((ind_alph1 == ind_alph2 | ncol(pair) == 3) & !all_wells) {
-      mle <- optimize(likelihood_single, interval = c(0, .5), maximum = FALSE,
+    # calculating the MLE for the frequency point estimate
+    # a different C++ function is called depending on what chain(s) are duals
+    if (dual_alph & dual_beta & !all_wells) {
+      mle <- optimize(likelihood_dualdual, interval = c(0, .5), maximum = FALSE,
                       err = error, numb_wells = well_clone,
                       numb_cells = sample_size_well, numb_sample = numb_sample)
-    } else if(!all_wells) {
+    } else if (dual_alph & !dual_beta & !all_wells) {
       mle <- optimize(likelihood_dual, interval = c(0, .5), maximum = FALSE,
+                      err = error, numb_wells = well_clone,
+                      numb_cells = sample_size_well, numb_sample = numb_sample)
+    } else if (dual_beta & !dual_alph & !all_wells) {
+      mle <- optimize(likelihood_dual, interval = c(0, .5), maximum = FALSE,
+                      err = error, numb_wells = well_clone,
+                      numb_cells = sample_size_well, numb_sample = numb_sample)
+    } else if (!dual_alph & !dual_beta & !all_wells) {
+      mle <- optimize(likelihood_single, interval = c(0, 0.5), maximum = FALSE,
                       err = error, numb_wells = well_clone,
                       numb_cells = sample_size_well, numb_sample = numb_sample)
     }
@@ -115,7 +130,6 @@ freq_estimate <- function(alpha, beta, pair, error = .15, cells) {
       if (unbound_ci) {
         CI.lower <- 0
       } else {
-        # browser()
         if (ci_single(1e-16, mle) * mle$minimum < 0) {
           CI_lower <- uniroot(ci_single, MLE = mle, lower = 1e-16,
                               upper = mle$minimum, tol = .Machine$double.eps)
@@ -125,35 +139,38 @@ freq_estimate <- function(alpha, beta, pair, error = .15, cells) {
           CI_lower <- 0
         }
       }
-      abundance.results[clone, 1] <- ind_beta
-      abundance.results[clone, 2] <- ind_alph1
-      abundance.results[clone, 3] <- ind_alph2
-      abundance.results[clone, 4] <- mle$minimum
-      abundance.results[clone, 5] <- CI_upper
-      abundance.results[clone, 6] <- CI_lower
-      abundance.results[clone, 7] <- CI_upper - CI_lower
-      if (ind_alph1 == ind_alph2) {
-        abundance.results[clone, 8] <- pair[clone, 4]
+      freq_results[clone, 1] <- ind_beta1
+      freq_results[clone, 2] <- ind_beta2
+      freq_results[clone, 3] <- ind_alph1
+      freq_results[clone, 4] <- ind_alph2
+      freq_results[clone, 5] <- mle$minimum
+      freq_results[clone, 6] <- CI_upper
+      freq_results[clone, 7] <- CI_lower
+      freq_results[clone, 8] <- CI_upper - CI_lower
+      if (!dual_alph & !dual_beta) {
+        freq_results[clone, 9] <- pair[clone, 5]
       } else {
-        abundance.results[clone, 8] <- -1
+        freq_results[clone, 9] <- -1
       }
     } else {
-      abundance.results[clone, 1] <- ind_beta
-      abundance.results[clone, 2] <- ind_alph1
-      abundance.results[clone, 3] <- ind_alph2
-      abundance.results[clone, 4] <- NA
-      abundance.results[clone, 5] <- NA
-      abundance.results[clone, 6] <- NA
-      abundance.results[clone, 7] <- NA
-      if (ind_alph1 == ind_alph2) {
-        abundance.results[clone, 8] <- pair[clone, 4]
+      freq_results[clone, 1] <- ind_beta1
+      freq_results[clone, 2] <- ind_beta2
+      freq_results[clone, 3] <- ind_alph1
+      freq_results[clone, 4] <- ind_alph2
+      freq_results[clone, 5] <- NA
+      freq_results[clone, 6] <- NA
+      freq_results[clone, 7] <- NA
+      freq_results[clone, 8] <- NA
+      if (!dual_alph & !dual_beta) {
+        freq_results[clone, 9] <- pair[clone, 5]
       } else {
-        abundance.results[clone, 8] <- -1
+        freq_results[clone, 9] <- -1
       }
     }
-    colnames(abundance.results) <- c("beta", "alpha1", "alpha2", "MLE", "CI_up",
-                                     "CI_low", "CI_length", "pct_replicates")
+    colnames(freq_results) <- c("beta1", "beta2", "alpha1", "alpha2",
+                                "MLE", "CI_up", "CI_low", "CI_length",
+                                "pct_replicates")
 
   } # end for clone
-  as.data.frame(abundance.results)
+  as.data.frame(freq_results)
 }
