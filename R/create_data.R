@@ -65,19 +65,26 @@ create_data <- function(TCR, plates = 5, error_drop = c(.15, .01),
     err_num_alph <- rep(2,  numb_alph)
     err_num_beta <- rep(2,  numb_beta)
 
-    numb_false_alph <- sum(err_num_alph)
-    numb_false_beta <- sum(err_num_beta)
+    if (error_seq[1] != 0) {
+      numb_false_alph <- sum(err_num_alph)
+      numb_false_beta <- sum(err_num_beta)
 
-    false_alph <- vector(mode = "list", length = numb_false_alph)
-    false_beta <- vector(mode = "list", length = numb_false_beta)
+      false_alph <- vector(mode = "list", length = numb_false_alph)
+      false_beta <- vector(mode = "list", length = numb_false_beta)
 
-    for (i in 1:numb_false_alph) {
-      false_alph[[i]] <- numb_alph + (2 * i - 1):(2 * i)
+      for (i in 1:numb_false_alph) {
+        false_alph[[i]] <- numb_alph + (2 * i - 1):(2 * i)
+      }
+      for (i in 1:numb_false_beta) {
+        false_beta[[i]] <- numb_beta + (2 * i - 1):(2 * i)
+      }
+    } else {
+      numb_false_alph <- 0
+      numb_false_beta <- 0
+
+      false_alph <- vector(mode = "list", length = numb_false_alph)
+      false_beta <- vector(mode = "list", length = numb_false_beta)
     }
-    for (i in 1:numb_false_beta) {
-      false_beta[[i]] <- numb_beta + (2 * i - 1):(2 * i)
-    }
-
   } else if (error_mode[2] == "lognormal") {
     # input mean and sd of the error drop rates
     err_mean <- error_seq[1]
