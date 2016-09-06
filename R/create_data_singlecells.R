@@ -32,7 +32,7 @@ create_data_singlecells <- function(TCR, plates = 5, error = .15, skewed = 15,
     rand <- sample(numb_clones, size = 1, prob = dist_vector, replace = TRUE)
     # Collecting the alpha chains that are chosen
     choice_alph    <- as.vector(TCR[rand,2:3])
-    half_len <- length(choice_alph)/2
+    half_len <- length(choice_alph) / 2
     remove_ind <- vector()
     for (x in half_len:1) {
       i1 <- x

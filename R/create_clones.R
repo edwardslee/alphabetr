@@ -47,11 +47,14 @@ create_clones <- function(numb_beta = 1000, dual_beta = 0, dual_alpha = 0.3, alp
   if (length(beta_sharing) == 0 | any(is.na(beta_sharing)) | any(beta_sharing < 0)){
     stop("Please include a valid beta chain sharing vector")
   }
-  if(sum(alpha_sharing) != 1) {
+  if (sum(alpha_sharing) != 1) {
     stop("Alpha sharing proportion do not add up to 100%")
   }
-  if(sum(beta_sharing) != 1) {
+  if (sum(beta_sharing) != 1) {
     stop("Beta sharing proportion do not add up to 100%")
+  }
+  if (length(numb_beta) != 1) {
+    stop("Length of the numb_beta argument must be 1")
   }
 
   if (length(alpha_sharing) < 7) {
