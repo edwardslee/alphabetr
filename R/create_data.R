@@ -49,7 +49,13 @@ create_data <- function(TCR, plates = 5, error_drop = c(.15, .01),
     # need to calculate the input parameters of the association normal dist; see vign
     mu <- log(err_mean) - log((err_sd / err_mean) ^ 2 + 1) / 2
     sd <- sqrt(log((err_sd / err_mean) ^ 2 + 1))
+    # log of 0 is -Inf, so need to manually specify when err_mean is 0
+    if (err_mean == 0) {
+      mu <- 0
+      sd <- 0
+    }
 
+    # sample drop rates from lognormal distribution; ensure none are greater than 90%
     drop_vec <- rlnorm(numb_clones, meanlog = mu, sdlog = sd)
     while (any(drop_vec > .9)) {
       drop_vec <- rlnorm(numb_clones, meanlog = mu, sdlog = sd)
@@ -59,19 +65,23 @@ create_data <- function(TCR, plates = 5, error_drop = c(.15, .01),
     stop("Invalid error model specification. Choose either 'constant' or 'lognormal'")
   }
 
+  # in-frame error rates: can be constant or occur on a distribution
   if (error_mode[2] == "constant") {
+    # when constant, all chains have same rate of being sequenced as one of two distinct erroneous sequences
     err_seq_alph <- rep(error_seq[1],  numb_alph)
     err_seq_beta <- rep(error_seq[1],  numb_beta)
     err_num_alph <- rep(2,  numb_alph)
     err_num_beta <- rep(2,  numb_beta)
 
+    # if the err rate is 0, then there are no false in frame chains
     if (error_seq[1] != 0) {
+      # summing up the number of false in-frame sequences
       numb_false_alph <- sum(err_num_alph)
       numb_false_beta <- sum(err_num_beta)
 
+      # lists record the erroneous chains associated with each chain
       false_alph <- vector(mode = "list", length = numb_false_alph)
       false_beta <- vector(mode = "list", length = numb_false_beta)
-
       for (i in 1:numb_false_alph) {
         false_alph[[i]] <- numb_alph + (2 * i - 1):(2 * i)
       }
@@ -79,9 +89,11 @@ create_data <- function(TCR, plates = 5, error_drop = c(.15, .01),
         false_beta[[i]] <- numb_beta + (2 * i - 1):(2 * i)
       }
     } else {
+      # when error rate is 0, set everything to 0
       numb_false_alph <- 0
       numb_false_beta <- 0
 
+      # lists are empty as well
       false_alph <- vector(mode = "list", length = numb_false_alph)
       false_beta <- vector(mode = "list", length = numb_false_beta)
     }
@@ -90,32 +102,45 @@ create_data <- function(TCR, plates = 5, error_drop = c(.15, .01),
     err_mean <- error_seq[1]
     err_sd   <- error_seq[2]
 
-    # need to calculate the input parameters of the association normal dist; see vign
-    mu <- log(err_mean) - log((err_sd / err_mean) ^ 2 + 1) / 2
-    sd <- sqrt(log((err_sd / err_mean) ^ 2 + 1))
+    # if err_mean is 0, then no need to bother with this
+    # if err_mean > 0, then we give error rates and # of erroneous in frame seqs
+    if (err_mean != 0) {
+      # need to calculate the input parameters of the association normal dist; see vign
+      mu <- log(err_mean) - log((err_sd / err_mean) ^ 2 + 1) / 2
+      sd <- sqrt(log((err_sd / err_mean) ^ 2 + 1))
 
-    err_seq_alph <- rlnorm(numb_alph, meanlog = mu, sdlog = sd)
-    err_seq_beta <- rlnorm(numb_beta, meanlog = mu, sdlog = sd)
-    err_num_alph <- sample(1:4, size = numb_alph, replace = TRUE)
-    err_num_beta <- sample(1:4, size = numb_beta, replace = TRUE)
+      # sample error rates from LN dist; each chain can be erroneously
+      # sequenced into 1-4 distinct different wrong chains
+      err_seq_alph <- rlnorm(numb_alph, meanlog = mu, sdlog = sd)
+      err_seq_beta <- rlnorm(numb_beta, meanlog = mu, sdlog = sd)
+      err_num_alph <- sample(1:4, size = numb_alph, replace = TRUE)
+      err_num_beta <- sample(1:4, size = numb_beta, replace = TRUE)
 
-    numb_false_alph <- sum(err_num_alph)
-    numb_false_beta <- sum(err_num_beta)
+      # number of false chains
+      numb_false_alph <- sum(err_num_alph)
+      numb_false_beta <- sum(err_num_beta)
 
-    false_alph <- vector(mode = "list", length = numb_alph)
-    false_beta <- vector(mode = "list", length = numb_beta)
+      # recording which errorenous chains are associated with which true chains
+      false_alph <- vector(mode = "list", length = numb_alph)
+      false_beta <- vector(mode = "list", length = numb_beta)
 
-    ind <- 1
-    for (i in 1:numb_alph) {
-      false_alph[[i]] <- numb_alph + ind:(ind + err_num_alph[i] - 1)
-      ind <- ind + err_num_alph[i]
+      ind <- 1
+      for (i in 1:numb_alph) {
+        false_alph[[i]] <- numb_alph + ind:(ind + err_num_alph[i] - 1)
+        ind <- ind + err_num_alph[i]
+      }
+      ind <- 1
+      for (i in 1:numb_beta) {
+        false_beta[[i]] <- numb_beta + ind:(ind + err_num_beta[i] - 1)
+        ind <- ind + err_num_beta[i]
+      }
+    } else { # when err_mean == 0
+      # no false sequences, no false sequences associated with any chain
+      numb_false_alph <- 0
+      numb_false_beta <- 0
+      false_alph <- vector(mode = "list", length = numb_alph)
+      false_beta <- vector(mode = "list", length = numb_beta)
     }
-    ind <- 1
-    for (i in 1:numb_beta) {
-      false_beta[[i]] <- numb_beta + ind:(ind + err_num_beta[i] - 1)
-      ind <- ind + err_num_beta[i]
-    }
-
   } else {
     stop("Invalid error model specification. Choose either 'constant' or 'lognormal'")
   }
