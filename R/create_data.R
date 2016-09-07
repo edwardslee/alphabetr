@@ -138,6 +138,8 @@ create_data <- function(TCR, plates = 5, error_drop = c(.15, .01),
       # no false sequences, no false sequences associated with any chain
       numb_false_alph <- 0
       numb_false_beta <- 0
+      err_seq_alph <- rep(0, numb_alph) # rlnorm(numb_alph, meanlog = mu, sdlog = sd)
+      err_seq_beta <- rep(0, numb_beta) # rlnorm(numb_beta, meanlog = mu, sdlog = sd)
       false_alph <- vector(mode = "list", length = numb_alph)
       false_beta <- vector(mode = "list", length = numb_beta)
     }
