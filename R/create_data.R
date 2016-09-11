@@ -113,8 +113,10 @@ create_data <- function(TCR, plates = 5, error_drop = c(.15, .01),
       # sequenced into 1-4 distinct different wrong chains
       err_seq_alph <- rlnorm(numb_alph, meanlog = mu, sdlog = sd)
       err_seq_beta <- rlnorm(numb_beta, meanlog = mu, sdlog = sd)
-      err_num_alph <- sample(1:4, size = numb_alph, replace = TRUE)
-      err_num_beta <- sample(1:4, size = numb_beta, replace = TRUE)
+      # err_num_alph <- sample(1:4, size = numb_alph, replace = TRUE)
+      # err_num_beta <- sample(1:4, size = numb_beta, replace = TRUE)
+      err_num_alph <- rep(3, numb_alph)
+      err_num_beta <- rep(3, numb_beta)
 
       # number of false chains
       numb_false_alph <- sum(err_num_alph)
