@@ -1,5 +1,6 @@
 #' @export
 dual_top <- function(alpha, beta, pair, error, cells) {
+  browser()
   number_plates <- nrow(alpha)/96  # number of plates
   max_beta <- ncol(beta)           # determine maximum beta index
 
@@ -46,7 +47,7 @@ dual_top <- function(alpha, beta, pair, error, cells) {
 
   #
   freq <- pair
-  freq <- freq[freq[, 8] > .8,]
+  freq <- freq[freq[, 9] > .8,]
   freq <- freq[order(freq[, "MLE"], decreasing = TRUE), ]
   freq <- freq[!is.na(freq[, "MLE"]), ]
   for (clon in 1:max_beta) {
@@ -133,5 +134,6 @@ dual_top <- function(alpha, beta, pair, error, cells) {
   filt_rec <- dplyr::filter(filt_rec, shared_LL > 40 & shared_LL < 100)
 
   filt_rec[, c(1, 1:3), drop = FALSE]
+  names(filt_rec) <- c("beta1", "beta2", "alpha1", "alpha2")
 
 }
