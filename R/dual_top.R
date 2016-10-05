@@ -1,5 +1,6 @@
 #' @export
 dual_top <- function(alpha, beta, pair, error, cells) {
+  browser()
   number_plates <- nrow(alpha)/96  # number of plates
   max_beta <- ncol(beta)           # determine maximum beta index
 
