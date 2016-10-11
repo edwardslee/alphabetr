@@ -83,7 +83,9 @@ dual_tail <- function(alpha, beta, freq_results, cells, population) {
           clus_ind <- clus_ind2
         } # end if - else
       } # end if
-    } # end if - nrow
+    } else {
+      clus_ind <- NULL
+    } # end if else - nrow
 
     list(results = rec, cluster = clus_ind)
   } # end function - dual_procedure

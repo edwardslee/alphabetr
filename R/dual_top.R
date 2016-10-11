@@ -50,7 +50,6 @@ dual_top <- function(alpha, beta, pair, error, cells) {
   freq <- freq[order(freq[, "MLE"], decreasing = TRUE), ]
   freq <- freq[!is.na(freq[, "MLE"]), ]
   for (clon in 1:max_beta) {
-    # browser()
     x <- freq[freq[, "beta1"] == clon, , drop = FALSE]  # find clones with the beta index
     numb_cand <- nrow(x)                            # find number of alphas associated with beta
     if (numb_cand > 1) {                            # if more than 1 alpha
