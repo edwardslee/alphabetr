@@ -132,8 +132,7 @@ dual_top <- function(alpha, beta, pair, error, cells) {
   filt_rec <- dplyr::filter(rec, diff > 10)
   filt_rec <- dplyr::filter(filt_rec, shared_LL > 40 & shared_LL < 100)
 
-  filt_rec[, c(1, 1:3), drop = FALSE]
-  names(filt_rec) <- c("beta1", "beta2", "alpha1", "alpha2")
-  filt_rec
-
+  dual_cand <- filt_rec[, c(1, 1:3), drop = FALSE]
+  names(dual_cand) <- c("beta1", "beta2", "alpha1", "alpha2")
+  dual_cand
 }
