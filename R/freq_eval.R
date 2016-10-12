@@ -1,6 +1,5 @@
 #' @export
 freq_eval <- function(freq, number_skewed, TCR_sizes, numb_clones, prop_top) {
-
   numb_clones <- nrow(TCR_sizes)
   last_term <- (1 - prop_top)/(numb_clones - number_skewed) * 1.1
   lhs11 <- 1
@@ -38,14 +37,21 @@ freq_eval <- function(freq, number_skewed, TCR_sizes, numb_clones, prop_top) {
   }
 
   freq <- freq[correct_top,, drop = FALSE ]
-  freq$answer  <- 0
-  freq$correct <- 0
+  if (nrow(freq) != 0) {
+    freq$answer  <- 0
+    freq$correct <- 0
+  } else {
+    freq <- as.data.frame(matrix(nrow = 0, ncol = 11))
+    names(freq) <- c("beta1", "beta2", "alpha1", "alpha2", "MLE",
+                     "CI_up", "CI_low", "CI_length", "pct_replicates", "answer",
+                     "correct") 
+  }
 
-  for(i in 1:nrow(freq)) {
+  for (i in seq_along(nrow(freq))) {
     ind_beta  <- freq[i, "beta1"]
     ind_alph1 <- freq[i, "alpha1"]
     ind_alph2 <- freq[i, "alpha2"]
-    if(!is.na(freq[i, "MLE"])) { #check to see if freq was estimatable at all
+    if (!is.na(freq[i, "MLE"])) { #check to see if freq was estimatable at all
       if (ind_alph1 == ind_alph2) {
         ind <- which(top_clones[, 1] == ind_beta &
                        (top_clones[, 3] == ind_alph1 | top_clones[, 4] == ind_alph1))
@@ -70,5 +76,9 @@ freq_eval <- function(freq, number_skewed, TCR_sizes, numb_clones, prop_top) {
             dplyr::filter(freq, correct == 1),
               precision = CI_length/MLE, CV = CI_length/MLE/3.92
             )
-  list(precision = mean(freq$precision), cv = mean(freq$CV), correct = sum(freq$correct)/numb_top)
+  if (nrow(freq) == 0) {
+    list(precision = NA, cv = NA, correct = 0)
+  } else {
+    list(precision = mean(freq$precision), cv = mean(freq$CV), correct = sum(freq$correct)/numb_top)
+  }
 }
