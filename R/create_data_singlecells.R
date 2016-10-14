@@ -156,9 +156,11 @@ create_data_singlecells <- function(TCR, plates = 5, error_drop = c(.15, .01),
   # is present in well i
   data_alph <- vector(mode = "list", length = wells)
   data_beta <- vector(mode = "list", length = wells)
+  data_clone <- matrix(nrow = wells, ncol = 3)
 
   for (n_well in 1:wells) {
     rand <- sample(numb_clones, size = 1, prob = dist_vector, replace = TRUE)
+    data_clone[n_well, 1] <- rand
     samp_clones <- TCR_drop[rand, , drop = FALSE]
 
     samp_beta <- matrix(nrow = 2 * nrow(samp_clones), ncol = 2)
@@ -177,6 +179,7 @@ create_data_singlecells <- function(TCR, plates = 5, error_drop = c(.15, .01),
     }
     # col 2 of samp beta has the drop rate; beta_i isn't dropped when runif > err
     samp_beta <- samp_beta[!is.na(samp_beta[, 1]), , drop = FALSE]
+    nodrop_beta <- samp_beta
     samp_beta <- samp_beta[runif(nrow(samp_beta)) > samp_beta[, 2], 1]
 
     samp_alph <- matrix(nrow = 2 * nrow(samp_clones), ncol = 2)
@@ -194,7 +197,16 @@ create_data_singlecells <- function(TCR, plates = 5, error_drop = c(.15, .01),
       }
     }
     samp_alph <- samp_alph[!is.na(samp_alph[, 1]), , drop = FALSE ]
+    nodrop_alph <- samp_alph
     samp_alph <- samp_alph[runif(nrow(samp_alph)) > samp_alph[, 2], 1]
+
+    #checking if dropped
+    if (length(samp_beta) < nrow(nodrop_beta) | length(samp_alph) < nrow(nodrop_alph)) {
+      data_clone[n_well, 2] <- 1
+    } else {
+      data_clone[n_well, 2] <- 0
+    }
+
 
     switch_alph <- which(runif(length(samp_alph)) < err_seq_alph[samp_alph])
     for (a in switch_alph) {
@@ -208,6 +220,10 @@ create_data_singlecells <- function(TCR, plates = 5, error_drop = c(.15, .01),
       samp_beta[b] <- sample(false_beta[[ind_beta]], size = 1)
     }
 
+    if (length(switch_beta) > 0 | length(switch_alph) > 0) {
+      data_clone[n_well, 3] <- 1
+    }
+
     data_alph[[n_well]] <- samp_alph
     data_beta[[n_well]] <- samp_beta
   } # end for - wells
@@ -218,6 +234,6 @@ create_data_singlecells <- function(TCR, plates = 5, error_drop = c(.15, .01),
 
   TCR <- TCR[order(TCR[, 1]), ]
 
-  list(alpha = data_alph, beta = data_beta, ans = TCR)
+  list(alpha = data_alph, beta = data_beta, drop = data_clone, ans = TCR)
 }
 # end main function
