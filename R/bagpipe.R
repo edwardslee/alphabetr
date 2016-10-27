@@ -21,8 +21,8 @@ NULL
 #'    data. See  .
 #' @param beta Matrix recording which beta chains appear in the each well of the
 #'    data. See .
-#' @param replicates The number of times the resampling procedure is repeated, i.e.
-#'    the number of replicates. At least 100 replicates is recommended.
+#' @param replicates The number of times the resampling procedure is repeated,
+#'    i.e. the number of replicates. At least 100 replicates is recommended.
 #' @param frac The fraction of the wells resampled in each replicate. Default
 #'    is 75\% of the wells
 #' @param thres A vector of thresholds (from 0 to 1) to use to filter the

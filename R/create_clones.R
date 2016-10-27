@@ -10,26 +10,30 @@
 #'    chain indices.
 #'
 #' @param numb_beta The number of unique betas in the clonal population
-#' @param dual The proportion of clones that are dual TCR clones, i.e. has two
-#'    distinct alpha chains
+#' @param dual_beta The proportion of clone that are dual TCRbeta clones, i.e.
+#'    has two distinct beta chains
+#' @param dual_alpha The proportion of clones that are dual TCRalpha clones,
+#'    i.e. has two distinct alpha chains
 #' @param beta_sharing A vector where the ith position represents the
 #'    proportion of beta chains that are shared by i clones; beta chains can be
 #'    shared by up to 5 clones
 #' @param alpha_sharing A vector where the ith position represents the
 #'    proportion of alpha chains that are shared by i clones; alpha chains can
-#'    be shared by up to 6 clones
+#'    be shared by up to 7 clones
 #'
-#' @return A n by 3 matrix, where n is the total number of clones, column 1 is
-#'    the beta index of the clone, column 2 is the alpha1 index of the clone,
-#'    and column 3 is the alpha2 index of the clone. If the clone is a single
-#'    TCR clone, then col 1 and col2 will have the same value. If the clone is
-#'    a dual TCR clone, then the indices in col 1 and col 2 will be different.
+#' @return A list of four different matrices. Each matrix is has dimensions
+#'    n x 4, where n is the total number of clones and each row represents the
+#'    chains of a clone. Column 1 and column 2 are the beta index/indices of the
+#'    beta chain(s) used by the clone. Column 3 and 4 are the alpha index/indices
+#'    of the alpha chain(s) used by the clone. If a clone has a single beta
+#'    chain, then col 1 and col 2 will be equal. If a clone has a single alpha
+#'    chain, then col 3 and col 4 will be equal.
 #'
 #' @examples
-#'    # Creating a population containing 1000 beta chains; 30% of clones with
-#'    # dual TCRs; 75% beta shared by one clone, 20% by two clones, 5% by three
-#'    # clones; 80% alpha chains shared by one clone, 15% by two clones, and 5%
-#'    # by three clones
+#'    # Creating a population containing 1000 beta chains; 10% of clones with
+#'    # dual-beta TCRs and 30% of clones with dual TCRs; 75% beta shared by one
+#'    # clone, 20% by two clones, 5% by three clones; 80% alpha chains shared by
+#'    # one clone, 15% by two clones, and 5% by three clones
 #'    TCR_pairings <- create_clones(numb_beta = 1000, dual = .3,
 #'                                  alpha_sharing = c(0.80, 0.15, 0.05),
 #'                                  beta_sharing  = c(0.75, 0.20, 0.05))
