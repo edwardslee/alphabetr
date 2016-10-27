@@ -19,7 +19,7 @@ dual_eval <- function(duals, pair, TCR_sizes, number_skewed, TCR_dual) {
   # if the freq estimation fails, then can't do the dual thing
   unest_pairs <- pair[is.na(pair[, "MLE"]), 1:4]
 
-  tail_dual_record <<- matrix(nrow = 0, ncol = 3)
+  tail_dual_record <- matrix(nrow = 0, ncol = 3)
   if (nrow(duals) > 0) { # if any duals are determined
     #----- number correct ------#
     # determine the number of correct top and tail dual clones in the list
@@ -43,8 +43,10 @@ dual_eval <- function(duals, pair, TCR_sizes, number_skewed, TCR_dual) {
       if (top_cond)  numb_correct_top  <- numb_correct_top + 1
       if (tail_cond) {
         numb_correct_tail <- numb_correct_tail + 1
-        tail_dual_record <<- rbind(tail_dual_record,
-                                   matrix(c(ind_beta, ind_alph1, ind_alph2), nrow = 1, ncol = 3))
+        tail_dual_record  <- rbind(tail_dual_record,
+                                   matrix(c(ind_beta, ind_alph1, ind_alph2),
+                                          nrow = 1, ncol = 3)
+                                   )
       }
     }
     numb_correct <- numb_correct_top + numb_correct_tail
@@ -123,6 +125,10 @@ dual_eval <- function(duals, pair, TCR_sizes, number_skewed, TCR_dual) {
       numb_poss_tail = numb_poss_tail,
       numb_unestimated_tail = numb_unest_tail))
   } else { # no duals determined
+    # since no duals were determined, there are no correct top or tail duals
+    numb_correct_top  <- 0
+    numb_correct_tail <- 0
+
     #------ number possible --------#
     numb_poss_top   <- 0
     numb_poss_tail  <- 0

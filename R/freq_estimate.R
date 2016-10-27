@@ -48,6 +48,8 @@ freq_estimate <- function(alpha, beta, pair, error = .15, cells) {
   numb_wells <- nrow(alpha)
   if(nrow(beta) != numb_wells)
     stop("Different number of wells in alpha and beta data sets")
+  if (nrow(pair) == 0)
+    stop("There no alpha-beta pairs to check (the pairs argument is empty).")
   numb_plates <- numb_wells / 96
   # if (all(names(pair)[1:4] != c("beta1", "beta2", "alpha1", "alpha2")) | ncol(pairs) == 5)
   #   stop("The pair argument should be a 5 col matrix, first 2 col for betas,
