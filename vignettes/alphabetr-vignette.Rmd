@@ -6,7 +6,7 @@ output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Using \textsc{alphabetr} to determine $\alpha\beta$TCR pairs}
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+  \usepackage[utf8]{inputenc}
 ---
 
 ```{r, echo = FALSE}
@@ -15,10 +15,14 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 
 # Introduction
 ## A Brief Welcome
-If you're reading this, you probably have some interest in sequencing T cell receptors (TCR), especially paired alpha-beta (or gamma-delta) sequences of individual TCRs. And you probably have a sense that this is *hard* to do in a high-throughput, scaleable, and efficient way. The immunology community has recently been innovating new and interesting solutions that range from pushing the limits of experimental techniques to using complicated statistical or computationals models (which includes our own approach). The dividing fragmentation of techniques that I perceive just confirms the reality that we don't have a good standard for getting paired TCR sequences. My hope is that this vignette will be clear and transparent in showing how we thought to solve this problem, not as be-all panacea for our sequencing woes but as a contribution towards the greater goal of moving the field closer to an industry standard. The main purpose of this vignette is to demonstrate how to obtain the results of our paper^[Paper was submitted recently] and how to do simulations of your own.
+Welcome to the `alphabetr` vignette!
+We've spent a lot of time trying to develop a TCR sequencing approach that is more scaleable than single-cell sequencing, and we're excited for others to use our approach.
+My hope is that this vignette will be clear and transparent in showing how we thought to solve this problem, not as be-all panacea for our sequencing woes but as one step towards the field closer to a gold standard.
+The main purpose of this vignette is to demonstrate how to obtain the results of our paper^[Paper was submitted recently] and how to do simulations of your own.
 
 ## Immunology background
-T cell receptors (TCR) are heterodimers of two chains, an alpha chain and a beta chain. Identifying TCRs of T cell clones at a minimum requires the identification of the pair of CDR3 sequences of the alpha and beta chains. 
+T cell receptors (TCR) are heterodimers of two chains, an alpha chain and a beta chain.
+Identifying TCRs of T cell clones at a minimum requires the identification of the pair of CDR3 sequences of the alpha and beta chains. 
 
 
 # Overview of the code
@@ -28,7 +32,7 @@ We'll start by looking at an overview of how to run the `alphabetr` functions on
 Sequencing data obtained with the alphabetr approach can be imported into R using the `read_alphabetr()` function. 
 
 ## Processing the sequencing data
-Figure 1 shows us what functions to use and when to use them. Our goals are to:
+Our goals are to:
 
 1. Determine alpha-beta candidate pairs
 2. Discriminate between dual-alpha TCR clones and beta-sharing clones
@@ -40,9 +44,10 @@ Figure 1 shows us what functions to use and when to use them. Our goals are to:
 
 **Estimating clonal frequencies.** The final list of candidate clones, which includes both single-alpha and dual-alpha clones, is then passed into `freq_estimate()` in order to get a final list of frequen estimates and 95% frequency confidence intervals. The package includes some helper functions to amend the original list of candidate pairs with the newly determined dual-alpha clones (used below in the rest of the vignette).
 
-```{r echo = FALSE, out.width = 650, fig.retina = NULL, fig.cap = "Figure 1"}
-knitr::include_graphics("overview.png")
-```
+<!-- ```{r echo = FALSE, out.width = 650, fig.retina = NULL, fig.cap = "Figure 1"} -->
+<!-- knitr::include_graphics("overview.png") -->
+<!-- ``` -->
+
 
 ## Simulating sequencing data
 Simulating the experimental data involves choosing parameters for two domains:
@@ -233,7 +238,7 @@ Before moving on, you may choose to the filter the candidate pairs with a thresh
 Our own simulations seem to indicate that a threshold of 0.3 to 0.5 gives a good balance of false pairing rate, tail depth, and dual depth:
 ```{r}
 # remove candidate pairs that don't appear in more than 30% of replicates
-pairs <- pairs[pairs[, "prop_replicates"] > .4, ]
+pairs <- pairs[pairs[, "prop_replicates"] > .3, ]
 head(pairs)
 ```
 
@@ -247,8 +252,8 @@ Using the data and output of `bagipe()` from above, we perform frequency estimat
 freq_init <- freq_estimate(alpha = data_alph,
                            beta = data_beta,
                            pair = pairs,
-                           error = err,
-                           cells = numb_cells)
+                           error = 0.15,
+                           numb_cells = numb_cells)
 head(freq_init)
 ```
 
@@ -262,13 +267,13 @@ common_dual <- dual_top(alpha = data_alph,
                         beta = data_beta,
                         pair = freq_init,
                         error = err,
-                        cells = numb_cells)
+                        numb_cells = numb_cells)
 
 # determining duals in the tail; note that this does NOT use the error rate
 tail_dual <- dual_tail(alpha = data_alph,
                        beta = data_beta,
                        freq_results = freq_init,
-                       cells = numb_cells)
+                       numb_cells = numb_cells)
 ```
 The arguments of these functions are the same arguments used before.
 
@@ -285,8 +290,8 @@ Now that we identified dual TCR-alpha clones, all that's left is to estimate the
 freq_dual <- freq_estimate(alpha = data_alph,
                            beta = data_beta,
                            pair = clones_dual,
-                           error = err,
-                           cells = numb_cells)
+                           error = 0.15,
+                           numb_cells = numb_cells)
 
 # Remove the candidate beta-sharing clones and replace with the dual clones
 tcrpairs <- combine_freq_results(freq_init, freq_dual)
@@ -300,6 +305,30 @@ head(tcrpairs)
 Note that if a clone is dual, then the `pct_replicates` column is set to -1.
 
 ## Evaluation of results
-To be finished.
+Two functions are included in the package to evaluate the performance of the frequency estimation and the dual discrimination.
+The function `dual_eval()` is used to determine how well the dual discrimination went.
+```{r}
+dual_res <- dual_eval(duals = clones_dual,
+                      pair = freq_init,
+                      TCR = TCR_pairings$TCR,
+                      number_skewed = number_skewed,
+                      TCR_dual = TCR_pairings$dual_alpha)
 
+# listing the false dual rate and the adjusted dual depths of the top and tail clones
+dual_res$fdr
+dual_res$adj_depth_top
+dual_res$adj_depth_tail
+```
 
+The function `freq_eval()` is used to determine how precise the frequency estimates are and how many 95\% confidence intervals contain the true clonal frequency.
+```{r}
+freq_res <- freq_eval(freq = tcrpairs,
+                      number_skewed = number_skewed,
+                      TCR = TCR_pairings$TCR,
+                      numb_clones = nrow(TCR_pairings$TCR),
+                      prop_top = pct_top)
+
+# CV of estimates and the proportion of CIs with correct frequency
+freq_res$cv
+freq_res$correct
+```
