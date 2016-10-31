@@ -22,7 +22,7 @@
 #'    two character vectors that give the CDR3 sequences associated with each
 #'    chain index.
 #'
-#' @example
+#' @examples
 #' \dontrun{
 #'   dat <- read_alphabetr(data = "alphabetr_data.csv")
 #'

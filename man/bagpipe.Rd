@@ -4,51 +4,76 @@
 \alias{bagpipe}
 \title{Identify candidate alpha/beta pairs.}
 \usage{
-bagpipe(alpha, beta, replicates = 100, frac = 0.75, thres = c(0.3, 0.6,
-  0.9), bootstrap = FALSE)
+bagpipe(alpha, beta, replicates = 100, frac = 0.75, bootstrap = FALSE)
 }
 \arguments{
 \item{alpha}{Matrix recording which alpha chains appear in each well of the
-data. See  .}
+data. See \code{\link{create_data}}.}
 
 \item{beta}{Matrix recording which beta chains appear in the each well of the
-data. See .}
+data. See \code{\link{create_data}}.}
 
-\item{replicates}{The number of times the resampling procedure is repeated, i.e.
-the number of replicates. At least 100 replicates is recommended.}
+\item{replicates}{The number of times the resampling procedure is repeated,
+i.e. the number of replicates. At least 100 replicates is recommended.}
 
 \item{frac}{The fraction of the wells resampled in each replicate. Default
 is 75\% of the wells}
-
-\item{thres}{A vector of thresholds (from 0 to 1) to use to filter the
-results from all of the candidate alpha/beta pairs from the resampling
-procedure.}
 
 \item{bootstrap}{Legacy option. Calls a bootstrapping strategy (which
 resamples with replacement) instead of sampling a subset without
 replacement.}
 }
 \value{
-A n x 2 matrix where
+A n x 5 matrix where n is the number of clones determined by
+  \code{bagpipe()}. Each row represents the chains of the clone.
+  Columns 1 and 2 represent the beta chain indices of the clone.
+  Columns 3 and 4 represent the alpha chain indices of the clone.
+  Column 5 represents the number of replicates that this clone was found in.
+  Column 5 is used to filter our the clones that have not be determined by
+  a certain "threshold" proportion of replicates.
+
+  Note that column 1 == column 2 and column 3 == column 4 since
+  \code{bagpipe()} does not try to determine dual-alpha or dual-beta clones.
 }
 \description{
 \code{bagpipe()} uses the alphabetr resampling procedure on sequencing data
-   to identify candidate alpha/beta pairs. The procedure takes a subsample
-   of the data without replacement, calculates association scores using ASOIDHAOISJ,
-   and then for each well uses the Hungarian algorithm to determine the most
-   likely pairings for the chains found in the well. Each time this is done
-   is a replicate, and the number of replicates is specified as an option.
-   A threshold is then used to filter the candidate pairs that appear in
-   proportion of the replicates larger than the threshold, resulting in the
-   final list of candidate pairs. Bagpipe is an acronym for
-   \strong{b}ootstrapping \strong{a}lphabetr \strong{g}enerated
-   \strong{p}a\strong{i}rs \strong{p}rocedur\strong{e} (based on older
-   versions that utilized bootstrapping)
+  to identify candidate alpha/beta pairs. The procedure takes a subsample of
+  the data without replacement, calculates association scores with
+  \code{\link{chain_scores}}, and then for each well, uses the Hungarian
+  algorithm to determine the most likely pairings for the chains found in the
+  well. Each time this is done is a replicate, and the number of replicates is
+  specified as an option. A threshold is then used to filter the candidate
+  pairs that appear in proportion of the replicates larger than the threshold,
+  resulting in the final list of candidate pairs. Bagpipe is an acronym for
+  \strong{b}ootstrapping \strong{a}lphabetr \strong{g}enerated
+  \strong{p}a\strong{i}rs \strong{p}rocedur\strong{e} (based on older versions
+  that utilized bootstrapping)
 }
 \examples{
-set.seed(110)
-createClones()
-createData()
-bagpipe(alpha = data_alph, beta = data_beta)
+ # see the help for create_clones() and create_data()
+ clones <- create_clones(numb_beta = 1000,
+                         dual = .3,
+                         alpha_sharing = c(0.80, 0.15, 0.05),
+                         beta_sharing  = c(0.75, 0.20, 0.05))
+ dat <- create_data(clones$TCR, plate = 5,
+                    error_drop = c(.15, .01),
+                    error_seq  = c(.05, .001),
+                    error_mode = c("lognormal", "lognormal"),
+                    skewed = 10,
+                    prop_top = 0.6,
+                    dist = "linear",
+                    numb_cells = matrix(c(50, 480), ncol = 2))
+
+ \dontrun{
+ # normally want to set replicates to 100 or more
+ pairs <- bagpipe(alpha = dat$alpha,
+               beta  = dat$beta,
+               replicates = 5,
+               frac = 0.75,
+               bootstrap = FALSE)
+
+ # using a threshold of 0.3 of replicates
+ pairs <- pairs[pairs[, 5] > 0.3, ]
+ }
 }
 

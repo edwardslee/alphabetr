@@ -1,3 +1,15 @@
+#' Discriminate between beta-sharing clones and dual-alpha TCR clones (optimized
+#' for common clones)
+#'
+#' \code{dual_tail()} distinguishes between clones that share a common beta
+#'    chain and dual TCR clones with two productive alpha chains. The procedure
+#'    tests the null hypothesis that two candidate alpha, beta pairs with the
+#'    same beta represent two separate clones by using the frequency estimates
+#'    to calculate the number of wells that both clones are expected to be in.
+#'    This is compared to the actual number of wells that both clones appear in,
+#'    and if the actual number is greater than the expected number, than the
+#'    pairs are chosen to represent a dual TCR clone.
+#'
 #' @export
 dual_top <- function(alpha, beta, pair, error, cells) {
   number_plates <- nrow(alpha)/96  # number of plates

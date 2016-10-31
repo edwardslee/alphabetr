@@ -1,4 +1,5 @@
-#' Discriminate between beta sharing clones and dual TCR clones.
+#' Discriminate between beta-sharing clones and dual-alpha TCR clones (optimized
+#' for rare clones)
 #'
 #' \code{dual_tail()} distinguishes between clones that share a common beta
 #'    chain and dual TCR clones with two productive alpha chains. The procedure
@@ -8,11 +9,11 @@
 #'    This is compared to the actual number of wells that both clones appear in,
 #'    and if the actual number is greater than the expected number, than the
 #'    pairs are chosen to represent a dual TCR clone.
-#' @param data_alpha Matrix recording which alpha chains appear in each well of the
-#'    data. See  .
-#' @param data_beta Matrix recording which beta chains appear in the each well of the
-#'    data. See .
-#' @param freq_results Output of \code{freq_estimate()}
+#' @param alpha Matrix recording which alpha chains appear in each well of the
+#'    data. See \code{\link{create_data}}.
+#' @param beta Matrix recording which beta chains appear in the each well of the
+#'    data. See \code{\link{create_data}}.
+#' @param freq_results Output of \code{\link{freq_estimate}}.
 #' @param numb_wells Vector containing the number of cells sampled in the wells
 #'    of each column of the plates.
 #'

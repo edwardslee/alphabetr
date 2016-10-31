@@ -1,4 +1,4 @@
-#' Estimation frequencies of clones identified by alphabetr
+#' Estimation of frequencies of clones identified by \code{alphabetr}
 #'
 #' \code{freq_estimate()} estimates the frequencies of clones with confidence
 #'    intervals by using a maximum likelihood approach. The function looks at
@@ -6,26 +6,30 @@
 #'    likely frequency that explains the data.
 #'
 #' @param alpha Matrix recording which alpha chains appear in each well of the
-#'    data. See  .
+#'    data. See \code{\link{create_data}}.
 #' @param beta Matrix recording which beta chains appear in the each well of the
-#'    data. See .
+#'    data. See \code{\link{create_data}}.
 #' @param pair A matrix where each row is a beta/alpha pair, column 1 is the
 #'    beta index, and column 2 is the alpha index.
-#' @param error The error or "dropped" chain rate due to PCR or sequencing
-#'    errors in the experimental pipeline.
-#' @param cells The number of cells per well in each column of the plates.
+#' @param error The mean error "dropped" chain rate due to PCR or sequencing
+#'    errors.
+#' @param numb_cells The number of cells per well in each column of the plates.
 #'    Should be a vector of 12 elements.
 #'
 #' @return A data frame with frequency estimates and confidence intervals
 #' @examples
-#' TCR <- create_clones()
-#' data <- create_data()
-#' results <- bagpipe(alpha = data$alpha, beta = data$beta, )
-#' freq <- freq_estimate(data$alpha, data$beta, results, 0.15, cellstor)
+#'  \dontrun{
+#'  # obtained from the output of bagpipe()
+#'  pairs <- pairs[pairs[, 5] > 0.3, ]
+#'  freq  <- freq_estimate(alpha = dat$alpha,
+#'                         beta = dat$beta,
+#'                         pair = pairs,
+#'                         numb_cells = matrix(c(50, 480), ncol = 2))
+#'  }
 #' @export
 
 
-freq_estimate <- function(alpha, beta, pair, error = .15, cells) {
+freq_estimate <- function(alpha, beta, pair, error = .15, numb_cells) {
   #-------- CI function - single --------#
   ci_single <- function(x, MLE) {
     likelihood_single(est = MLE$minimum, err = error, numb_wells = well_clone,

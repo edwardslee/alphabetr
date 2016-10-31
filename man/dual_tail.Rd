@@ -2,18 +2,19 @@
 % Please edit documentation in R/dual_tail.R
 \name{dual_tail}
 \alias{dual_tail}
-\title{Discriminate between beta sharing clones and dual TCR clones.}
+\title{Discriminate between beta-sharing clones and dual-alpha TCR clones (optimized
+for rare clones)}
 \usage{
 dual_tail(alpha, beta, freq_results, cells, population)
 }
 \arguments{
-\item{freq_results}{Output of \code{freq_estimate()}}
+\item{alpha}{Matrix recording which alpha chains appear in each well of the
+data. See \code{\link{create_data}}.}
 
-\item{data_alpha}{Matrix recording which alpha chains appear in each well of the
-data. See  .}
+\item{beta}{Matrix recording which beta chains appear in the each well of the
+data. See \code{\link{create_data}}.}
 
-\item{data_beta}{Matrix recording which beta chains appear in the each well of the
-data. See .}
+\item{freq_results}{Output of \code{\link{freq_estimate}}.}
 
 \item{numb_wells}{Vector containing the number of cells sampled in the wells
 of each column of the plates.}

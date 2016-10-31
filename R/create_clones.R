@@ -1,13 +1,13 @@
 #' Create a synthetic set of clones with a specific underlying clonal structure
 #'
-#' \code{create_clones()} creates a set of (beta, alpha1, alpha2) triples that
-#'    represents the indices of the chains of clones. The function will take a
-#'    fixed number of unique beta chains that are in the T cell population, and
-#'    then use the degree of beta and alpha sharing to determine the number of
-#'    unique alpha chains in the populations. These chains will then be randomly
-#'    assigned to each other, with a proportion of them being dual TCR clones
-#'    (i.e. alpha1 != alpha2), forming our random list of clones with their
-#'    chain indices.
+#' \code{create_clones()} creates a set of (beta1, beta2, alpha1, alpha2)
+#'    quadruples that represent the indices of the chains of clones. The function
+#'    will take a fixed number of unique beta chains that are in the T cell
+#'    population, and then use the degree of beta and alpha sharing to determine
+#'    the number of unique alpha chains in the populations. These chains will
+#'    then be randomly assigned to each other, with a proportion of them being
+#'    dual TCR clones (i.e. alpha1 != alpha2 and/or beta1 != beta2), forming
+#'    our random list of clones with their chain indices.
 #'
 #' @param numb_beta The number of unique betas in the clonal population
 #' @param dual_beta The proportion of clone that are dual TCRbeta clones, i.e.
@@ -30,16 +30,18 @@
 #'    chain, then col 3 and col 4 will be equal.
 #'
 #' @examples
-#'    # Creating a population containing 1000 beta chains; 10% of clones with
-#'    # dual-beta TCRs and 30% of clones with dual TCRs; 75% beta shared by one
-#'    # clone, 20% by two clones, 5% by three clones; 80% alpha chains shared by
-#'    # one clone, 15% by two clones, and 5% by three clones
-#'    TCR_pairings <- create_clones(numb_beta = 1000, dual = .3,
-#'                                  alpha_sharing = c(0.80, 0.15, 0.05),
-#'                                  beta_sharing  = c(0.75, 0.20, 0.05))
+#'  # Creating a population containing 1000 beta chains; 10% of clones with
+#'  # dual-beta TCRs and 30% of clones with dual TCRs; 75% beta shared by one
+#'  # clone, 20% by two clones, 5% by three clones; 80% alpha chains shared by
+#'  # one clone, 15% by two clones, and 5% by three clones
+#'
+#'  clones <- create_clones(numb_beta = 1000,
+#'                          dual = .3,
+#'                          alpha_sharing = c(0.80, 0.15, 0.05),
+#'                          beta_sharing  = c(0.75, 0.20, 0.05))
 #'
 #' @export
-create_clones <- function(numb_beta = 1000, dual_beta = 0, dual_alpha = 0.3, alpha_sharing, beta_sharing) {
+create_clones <- function(numb_beta, dual_beta, dual_alpha, alpha_sharing, beta_sharing) {
   # sharing for paper:
   # alpha_sharing = c(.816, .085, .021, .007, .033, .005, .033)
   # beta_sharing = c(.859, .076, .037, .019, .009)
@@ -215,5 +217,8 @@ create_clones <- function(numb_beta = 1000, dual_beta = 0, dual_alpha = 0.3, alp
   colnames(dual_alph) <- c("beta1", "beta2", "alpha1", "alpha2")
   colnames(dual_beta) <- c("beta1", "beta2", "alpha1", "alpha2")
 
-  list(TCR = clones, ordered = ordered, dual_alpha = dual_alph, dual_beta = dual_beta)
+  list(TCR = clones,
+       ordered = ordered,
+       dual_alpha = dual_alph,
+       dual_beta = dual_beta)
 } # end function

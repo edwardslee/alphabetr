@@ -1,3 +1,63 @@
+#' Simulate sequencing data obtained single-cell sequencing
+#'
+#' \code{create_data_singlecells()} simulates a single-cell sequencing
+#' experiment by sampling clones from a clonal structure specified by the user
+#' and using the same error models and frequency distributions used in
+#' \code{\link{create_data}}. These functions are almost identical except this
+#' one simulates the sampling and sequencing of single T cells.
+#'
+#' @param TCR The specified clonal structure, which can be created from
+#'    \code{\link{create_clones}}.
+#' @param plates The number of plates of data. The number of single-cells is 96
+#'    times \code{plates}.
+#' @param error_drop A vector of length 2 with the mean of the drop error rate
+#'    and the sd of the drop error rate.
+#' @param error_seq A vector of length 2 with the mean of the in-frame error
+#'    rate and the sd of the in-frame error rate.
+#' @param error_mode A vector of two strings determining the "mode" of the error
+#'    models. The first element sets the mode of the drop errors, and the second
+#'    element sets the mode of the in-frame errors. The two modes available are
+#'    "constant" for a constant error rate and "lognormal" for error rates
+#'    drawn from a lognormal distribution. If the mode is set to "constant" the
+#'    sd specified in \code{error_drop} and/or \code{error_seq} will be ignored.
+#' @param skewed Number of clones represent the top proportion of the population
+#'    by frequency (which is specified by \code{prop_top}).
+#' @param prop_top The proportion of the population in frequency represented by
+#'    the number of clones specified by \code{skewed}.
+#' @param dist The distribution of frequency of the top clones. Currently only
+#'    "linear" is available.
+#'
+#' @return A list of length 3. The first element is a matrix representing the
+#'    data of the alpha chains ($alpha), and the second element is a matrix representing
+#'    the data of beta chains ($beta). The matrix represents the sequencing data by
+#'    representing the wells of the data by rows and the chain indices by
+#'    column. Entry [i, j] of the matrix represents if chain j is found in
+#'    well i (yes == 1, no == 0). e.g. if alpha chain 25 is found in well 10,
+#'    then [10, 25] of the alpha matrix will be 1.
+#'
+#'    The third element of the list ($drop) is a matrix that records the index
+#'    of the \strong{clone} sampled in the well (col 1), records if a drop error
+#'    occurred (col 2), and record if an in-frame error occurred (col 3).
+#'
+#' @examples
+#'  # see the help for create_clones() for details of this function call
+#'  clones <- create_clones(numb_beta = 1000,
+#'                       dual = .3,
+#'                       alpha_sharing = c(0.80, 0.15, 0.05),
+#'                       beta_sharing  = c(0.75, 0.20, 0.05))
+#'
+#'  # creating a data set with 480 single cells, lognormal error rates, 10 clones
+#'  # making up the top 60% of the population in frequency, and a constant
+#'  # sampling strategy of 50 cells per well for 480 wells (five 96-well plates)
+#'  dat <- create_data_singlecells(clones$TCR, plate = 5,
+#'                                 error_drop = c(.15, .01),
+#'                                 error_seq  = c(.05, .001),
+#'                                 error_mode = c("lognormal", "lognormal"),
+#'                                 skewed = 10,
+#'                                 prop_top = 0.6,
+#'                                 dist = "linear")
+#'
+#'
 #' @export
 create_data_singlecells <- function(TCR, plates = 5, error_drop = c(.15, .01),
                         error_seq = c(.05, .01), error_mode = c("constant", "constant"),
@@ -234,6 +294,6 @@ create_data_singlecells <- function(TCR, plates = 5, error_drop = c(.15, .01),
 
   TCR <- TCR[order(TCR[, 1]), ]
 
-  list(alpha = data_alph, beta = data_beta, drop = data_clone, ans = TCR)
+  list(alpha = data_alph, beta = data_beta, drop = data_clone)
 }
 # end main function

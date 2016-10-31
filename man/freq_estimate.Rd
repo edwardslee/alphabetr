@@ -2,24 +2,24 @@
 % Please edit documentation in R/freq_estimate.R
 \name{freq_estimate}
 \alias{freq_estimate}
-\title{Estimation frequencies of clones identified by alphabetr}
+\title{Estimation of frequencies of clones identified by \code{alphabetr}}
 \usage{
-freq_estimate(alpha, beta, pair, error = 0.15, cells)
+freq_estimate(alpha, beta, pair, error = 0.15, numb_cells)
 }
 \arguments{
 \item{alpha}{Matrix recording which alpha chains appear in each well of the
-data. See  .}
+data. See \code{\link{create_data}}.}
 
 \item{beta}{Matrix recording which beta chains appear in the each well of the
-data. See .}
+data. See \code{\link{create_data}}.}
 
 \item{pair}{A matrix where each row is a beta/alpha pair, column 1 is the
 beta index, and column 2 is the alpha index.}
 
-\item{error}{The error or "dropped" chain rate due to PCR or sequencing
-errors in the experimental pipeline.}
+\item{error}{The mean error "dropped" chain rate due to PCR or sequencing
+errors.}
 
-\item{cells}{The number of cells per well in each column of the plates.
+\item{numb_cells}{The number of cells per well in each column of the plates.
 Should be a vector of 12 elements.}
 }
 \value{
@@ -32,9 +32,13 @@ A data frame with frequency estimates and confidence intervals
    likely frequency that explains the data.
 }
 \examples{
-TCR <- create_clones()
-data <- create_data()
-results <- bagpipe(alpha = data$alpha, beta = data$beta, )
-freq <- freq_estimate(data$alpha, data$beta, results, 0.15, cellstor)
+ \dontrun{
+ # obtained from the output of bagpipe()
+ pairs <- pairs[pairs[, 5] > 0.3, ]
+ freq  <- freq_estimate(alpha = dat$alpha,
+                        beta = dat$beta,
+                        pair = pairs,
+                        numb_cells = matrix(c(50, 480), ncol = 2))
+ }
 }
 

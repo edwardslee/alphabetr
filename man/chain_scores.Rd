@@ -8,31 +8,45 @@ chain_scores(data_a, data_b)
 }
 \arguments{
 \item{data_a}{Matrix recording which alpha chains appear in each well of the
-data. See .}
+data. See \code{\link{create_clones}}.}
 
-\item{beta}{Matrix recording which beta chains appear in the each well of the
-data. See .}
+\item{data_b}{Matrix recording which beta chains appear in the each well of the
+data. See \code{\link{create_clones}}.}
 
 \item{numb_wells}{Vector containing the number of cells sampled in the wells
 of each column of the plates.}
 }
 \value{
 A list containing the alpha and beta association scores. Accessed
-   with list$alpha and list$beta respectively.
+   with \code{list$ascores} and \code{list$bscores} respectively.
 }
 \description{
 \code{chain_scores()} calculates association scores between every pair of
    alpha and beta chains based on the number of concurrent well appearances
    each alpha and beta pair makes, scaled inversely by the number of unique
-   chains in that well. See Lee et. al. 2016 for more information about this
+   chains in that well. See Lee et. al. for more information about this
    procedure.
 }
 \examples{
-   set.seed(110)
-   createClones()
-   createData()
-   scores <- chain_scores(data_a = data_alph, data_b = data_beta,
-                          numb_cells = cells_vec)
-   scores <- scores$alpha + scores$beta
+ # see the help for create_clones() and create_data()
+ clones <- create_clones(numb_beta = 1000,
+                         dual = .3,
+                         alpha_sharing = c(0.80, 0.15, 0.05),
+                         beta_sharing  = c(0.75, 0.20, 0.05))
+ dat <- create_data(clones$TCR, plate = 5,
+                    error_drop = c(.15, .01),
+                    error_seq  = c(.05, .001),
+                    error_mode = c("lognormal", "lognormal"),
+                    skewed = 10,
+                    prop_top = 0.6,
+                    dist = "linear",
+                    numb_cells = matrix(c(50, 480), ncol = 2))
+
+ #this is done internally in bagpipe()
+ scores <- chain_scores(data_a = dat$alpha,
+                        data_b = dat$beta,
+                        numb_cells = matrix(c(50, 480), ncol = 2))
+ scores <- scores$ascores + scores$bscores
+
 }
 
