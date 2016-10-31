@@ -9,8 +9,10 @@
 #'    data. See \code{\link{create_data}}.
 #' @param beta Matrix recording which beta chains appear in the each well of the
 #'    data. See \code{\link{create_data}}.
-#' @param pair A matrix where each row is a beta/alpha pair, column 1 is the
-#'    beta index, and column 2 is the alpha index.
+#' @param pair A matrix where each row is a beta/alpha pair, column 1 and 2 are
+#'    the beta indices, and column 3 and 4 are the alpha indices, and column 5
+#'    is the proportion of replicates the clone was found in (or equal to -1 if
+#'    the clone is dual)
 #' @param error The mean error "dropped" chain rate due to PCR or sequencing
 #'    errors.
 #' @param numb_cells The number of cells per well in each column of the plates.
@@ -42,9 +44,9 @@ freq_estimate <- function(alpha, beta, pair, error = .15, numb_cells) {
   #-------- CI function - single --------#
   ci_dual <- function(x, MLE) {
     likelihood_dual(est = MLE$minimum, err = error, numb_wells = well_clone,
-                    numb_cells = cells) -
+                    numb_cells = numb_cells) -
       likelihood_dual(est = x, err = error, numb_wells = well_clone,
-                      numb_cells = cells) + 1.96
+                      numb_cells = numb_cells) + 1.96
   } # end function - ci.function
   #-------- CI function - single --------#
 
@@ -75,8 +77,8 @@ freq_estimate <- function(alpha, beta, pair, error = .15, numb_cells) {
 
     # Determing which wells that contain the clone a clone is counted to be in a
     # well if their component chains are found in the same well
-    sample_size_well <- cells[, 1]     # number of cells per well
-    numb_sample <- cells[, 2]          # number of wells w/ sample size
+    sample_size_well <- numb_cells[, 1]     # number of cells per well
+    numb_sample <- numb_cells[, 2]          # number of wells w/ sample size
 
     numb_distinct <- length(sample_size_well)
     well_clone <- rep(0, numb_distinct)

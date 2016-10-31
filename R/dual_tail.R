@@ -9,6 +9,7 @@
 #'    This is compared to the actual number of wells that both clones appear in,
 #'    and if the actual number is greater than the expected number, than the
 #'    pairs are chosen to represent a dual TCR clone.
+#'
 #' @param alpha Matrix recording which alpha chains appear in each well of the
 #'    data. See \code{\link{create_data}}.
 #' @param beta Matrix recording which beta chains appear in the each well of the
@@ -20,9 +21,9 @@
 #' @return A n x 3 matrix where n is the number of candidate clones, column 1
 #'    is the beta index of the clone, and column 2-3 are the alpha indices of
 #'    the clone
-#' @examples asdfas
+#'
 #' @export
-dual_tail <- function(alpha, beta, freq_results, cells, population) {
+dual_tail <- function(alpha, beta, freq_results, numb_cells) {
   freq_results <- freq_results[order(freq_results[, "MLE"], decreasing = TRUE), ]
   freq_results <- freq_results[!is.na(freq_results[, "MLE"]), ]
 
@@ -93,8 +94,8 @@ dual_tail <- function(alpha, beta, freq_results, cells, population) {
 
   # parameters
   max_beta <- ncol(beta)              # determine maximum beta index
-  sample_size_well <- cells[, 1]      # number of cells per well
-  numb_sample <- cells[, 2]           # number of wells w/ sample size
+  sample_size_well <- numb_cells[, 1]      # number of cells per well
+  numb_sample <- numb_cells[, 2]           # number of wells w/ sample size
 
   # perform the dual discrimination for the tail
   tail_dual <- dual_procedure(alpha, beta, freq_results, cells)

@@ -1,7 +1,7 @@
 Package: alphabetr
 Type: Package
 Title: Algorithms for high-throughput sequencing of antigen-specific T cells
-Version: 0.2.0
+Version: 0.2.1
 Authors@R: person("Edward", "Lee", email = "email.edwardlee@gmail.com", role = c("aut", "cre"))
 Description: Provides algorithms for frequency-based pairing of alpha-beta T
   cell receptors.

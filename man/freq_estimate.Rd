@@ -13,8 +13,10 @@ data. See \code{\link{create_data}}.}
 \item{beta}{Matrix recording which beta chains appear in the each well of the
 data. See \code{\link{create_data}}.}
 
-\item{pair}{A matrix where each row is a beta/alpha pair, column 1 is the
-beta index, and column 2 is the alpha index.}
+\item{pair}{A matrix where each row is a beta/alpha pair, column 1 and 2 are
+the beta indices, and column 3 and 4 are the alpha indices, and column 5
+is the proportion of replicates the clone was found in (or equal to -1 if
+the clone is dual)}
 
 \item{error}{The mean error "dropped" chain rate due to PCR or sequencing
 errors.}

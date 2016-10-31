@@ -5,7 +5,7 @@
 \title{Discriminate between beta-sharing clones and dual-alpha TCR clones (optimized
 for rare clones)}
 \usage{
-dual_tail(alpha, beta, freq_results, cells, population)
+dual_tail(alpha, beta, freq_results, numb_cells)
 }
 \arguments{
 \item{alpha}{Matrix recording which alpha chains appear in each well of the
@@ -33,8 +33,5 @@ A n x 3 matrix where n is the number of candidate clones, column 1
    This is compared to the actual number of wells that both clones appear in,
    and if the actual number is greater than the expected number, than the
    pairs are chosen to represent a dual TCR clone.
-}
-\examples{
-asdfas
 }
 

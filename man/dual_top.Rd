@@ -5,16 +5,38 @@
 \title{Discriminate between beta-sharing clones and dual-alpha TCR clones (optimized
 for common clones)}
 \usage{
-dual_top(alpha, beta, pair, error, cells)
+dual_top(alpha, beta, pair, error, numb_cells)
+}
+\arguments{
+\item{alpha}{Matrix recording which alpha chains appear in each well of the
+data. See \code{\link{create_data}}.}
+
+\item{beta}{Matrix recording which beta chains appear in the each well of the
+data. See \code{\link{create_data}}.}
+
+\item{pair}{A matrix where each row is a beta/alpha pair, column 1 and 2 are
+the beta indices, and column 3 and 4 are the alpha indices, and column 5
+is the proportion of replicates the clone was found in (or equal to -1 if
+the clone is dual)}
+
+\item{error}{The mean error "dropped" chain rate due to PCR or sequencing
+errors.}
+
+\item{numb_cells}{The number of cells per well in each column of the plates.
+Should be a vector of 12 elements.}
+}
+\value{
+A matrix of dual-alpha clones, where col 1 and 2 are beta indices of
+ the clone (which should be equal) and col 3 and 4 are alpha indices of the
+ clone (which are different).
 }
 \description{
-\code{dual_tail()} distinguishes between clones that share a common beta
+\code{dual_top()} distinguishes between clones that share a common beta
    chain and dual TCR clones with two productive alpha chains. The procedure
-   tests the null hypothesis that two candidate alpha, beta pairs with the
-   same beta represent two separate clones by using the frequency estimates
-   to calculate the number of wells that both clones are expected to be in.
-   This is compared to the actual number of wells that both clones appear in,
-   and if the actual number is greater than the expected number, than the
-   pairs are chosen to represent a dual TCR clone.
+   calculates the likelihood that two (alpha, beta) pairs (with common a beta
+   chain) come from two distinct clones sharing the same beta chain vs the
+   likelihood that the two pairs derive from a dual TCR-alpha clone.
+   A significant difference between the two likelihoods is indicative of a
+   dual alpha clone, and these clones are returned as dual clones.
 }
 
