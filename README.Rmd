@@ -1,28 +1,31 @@
 ---
-title: "README.Rmd"
-output: html_document
+output:
+  md_document:
+    variant: markdown_github
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r, echo = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
 ```
 
-## R Markdown
+## alphabetr
+`alphabetr` implements the ALPHABETR (algorithm for pairing alpha-beta T cell receptors) algorithms for obtaining TCR sequence pairs. This approach determines CDR3A/CDR3B pairs from high-throughput sequencing data from repeated samples of antigen-specific T cell populations. 
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+With alphabetr, you can
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+* Determine CDR3A/CDR3B pairs
+* Determine dual TCR-alpha clones and clones that share CDR3A or CDR3B sequences
+* Estimate clonal frequencies
 
-```{r cars}
-summary(cars)
+You can install by:
+```{r}
+if (packageVersion("devtools") < 1.6) {
+  install.packages("devtools")
+}
+devtools::install_github("edwardslee/alphabetr")
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+If you encounter any bugs, please file an [issue](https://github.com/edwardslee/alphabetr/issues).
