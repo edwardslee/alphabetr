@@ -16,8 +16,6 @@ if (packageVersion("devtools") < 1.6) {
   install.packages("devtools")
 }
 devtools::install_github("edwardslee/alphabetr")
-#> Skipping install of 'alphabetr' from a github remote, the SHA1 (19d13d27) has not changed since last install.
-#>   Use `force = TRUE` to force installation
 ```
 
 If you encounter any bugs, please file an [issue](https://github.com/edwardslee/alphabetr/issues).

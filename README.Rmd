@@ -21,7 +21,7 @@ With alphabetr, you can
 * Estimate clonal frequencies
 
 You can install by:
-```{r}
+```{r eval = FALSE}
 if (packageVersion("devtools") < 1.6) {
   install.packages("devtools")
 }
