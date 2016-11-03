@@ -7,11 +7,11 @@
 #' clones and replace them with the appropriate dual clone entry.
 #'
 #' @param single Frequency estimation results of single TCR clones (usually from
-#'   the first time \code{freq_estimate()} is called)
+#'   the first time \code{\link{freq_estimate}} is called)
 #' @param dual Frequency estimation results of dual TCR-alpha clones
 #'
 #' @return A data.frame with the same structure as the output of
-#'    \code{\link{freq_estimate()}}. If two single "clones" in the \code{single}
+#'    \code{\link{freq_estimate}}. If two single "clones" in the \code{single}
 #'    data.frame is represented by a dual clone in \code{dual}, then it is
 #'    removed and replaced with one row represented by the dual clone.
 #'

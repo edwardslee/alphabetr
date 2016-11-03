@@ -52,7 +52,8 @@ A n x 5 matrix where n is the number of clones determined by
 \examples{
  # see the help for create_clones() and create_data()
  clones <- create_clones(numb_beta = 1000,
-                         dual = .3,
+                         dual_alpha = .3,
+                         dual_beta = .06,
                          alpha_sharing = c(0.80, 0.15, 0.05),
                          beta_sharing  = c(0.75, 0.20, 0.05))
  dat <- create_data(clones$TCR, plate = 5,

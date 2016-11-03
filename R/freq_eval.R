@@ -3,7 +3,7 @@
 #' \code{freq_eval()} will evaluated how well \code{\link{freq_estimate}} performed
 #' by calculating the precision and CV of the frequency estimates for the top
 #' clones and by determining the proportion of the top clones whose true clonal
-#' frequency lies in the 95-percent CI determined by \code{\link{freq_esimate}}
+#' frequency lies in the 95-percent CI determined by \code{\link{freq_estimate}}
 #'
 #' @param freq The output of \code{\link{freq_estimate}}
 #' @param number_skewed The number of clones represent the top proportion of

@@ -16,7 +16,7 @@ data. See \code{\link{create_data}}.}
 
 \item{freq_results}{Output of \code{\link{freq_estimate}}.}
 
-\item{numb_wells}{Vector containing the number of cells sampled in the wells
+\item{numb_cells}{Vector containing the number of cells sampled in the wells
 of each column of the plates.}
 }
 \value{

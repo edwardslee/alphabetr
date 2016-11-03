@@ -2,22 +2,30 @@
 % Please edit documentation in R/RcppExports.R
 \name{dual_discrim_dual_likelihood}
 \alias{dual_discrim_dual_likelihood}
-\title{Calculate likelihood of dual clone}
+\title{Calculate likelihood of two beta-sharing candidate alpha-beta pairs deriving from a dual clone}
 \usage{
 dual_discrim_dual_likelihood(est, err, numb_cells, numb_wells, binomials)
 }
 \arguments{
-\item{est}{a}
+\item{est}{Frequency estimate of the putative dual-alpha clone}
 
-\item{err}{a}
+\item{err}{Mean drop error rate}
 
-\item{numb_cells}{a}
+\item{numb_cells}{Vector containing the number of cells per well}
 
-\item{numb_wells}{a}
+\item{numb_wells}{Vector containing the number of wells with the sample
+sizes given by \code{numb_cells}}
 
-\item{binomials}{a}
+\item{binomials}{Calculations of the needed binomial coefficients; this is
+faster in R than in Rcpp (from my own tests)}
+}
+\value{
+A numeric containing the negative log likelihood
 }
 \description{
-Calculate likelihood of dual clone
+\code{dual_discrim_dual_likelihood()} is used within \code{\link{dual_top}}
+to calculate the likelihood that two alpha-beta pairs identified by
+\code{\link{bagpipe}} sharing the same beta chain derive from a single
+dual-alpha clone (instead of two distinct clones sharing the same beta).
 }
 

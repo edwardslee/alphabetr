@@ -1,15 +1,21 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
-//' Calculate likelihood of a single TCR clone
+//' Calculate likelihood curve of frequency estimates for a dual-alpha or
+//' dual-beta TCR clone
 //'
-//' @param est a
-//' @param err a
-//' @param numb_cells a
-//' @param numb_wells a
-//' @param numb_sample a
+//' @param est Clonal frequency estimate
+//' @param err Mean drop error rate
+//' @param numb_cells A vector of the distinct sample sizes, i.e. the number of
+//'    cells per well
+//' @param numb_wells A vector with the number of wells with the distinct
+//'    sample sizes
+//' @param numb_sample A vector with the number of wells of the sample size of
+//'    the same position of \code{numb_cells} that contains both alpha and the
+//'    beta chain of the clone (for dual-alpha clones) or both beta and the
+//'    alpha chain of the clone (for dual-beta clones)
 //'
-//' @export
+//' @return A numeric with the negative log likelihood
 // [[Rcpp::export]]
 double likelihood_dual(double est, double err, NumericVector numb_wells, NumericVector numb_cells, NumericVector numb_sample)
 {

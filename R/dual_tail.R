@@ -15,7 +15,7 @@
 #' @param beta Matrix recording which beta chains appear in the each well of the
 #'    data. See \code{\link{create_data}}.
 #' @param freq_results Output of \code{\link{freq_estimate}}.
-#' @param numb_wells Vector containing the number of cells sampled in the wells
+#' @param numb_cells Vector containing the number of cells sampled in the wells
 #'    of each column of the plates.
 #'
 #' @return A n x 3 matrix where n is the number of candidate clones, column 1
@@ -98,7 +98,7 @@ dual_tail <- function(alpha, beta, freq_results, numb_cells) {
   numb_sample <- numb_cells[, 2]           # number of wells w/ sample size
 
   # perform the dual discrimination for the tail
-  tail_dual <- dual_procedure(alpha, beta, freq_results, cells)
+  tail_dual <- dual_procedure(alpha, beta, freq_results, numb_cells)
   tail_rec <- tail_dual$results
   tail_rec <- tail_rec[tail_dual$cluster, 1:4, drop = FALSE]
 

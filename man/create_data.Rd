@@ -60,9 +60,10 @@ A list of length 2. The first element is a matrix representing the
 \examples{
  # see the help for create_clones() for details of this function call
  clones <- create_clones(numb_beta = 1000,
-                      dual = .3,
-                      alpha_sharing = c(0.80, 0.15, 0.05),
-                      beta_sharing  = c(0.75, 0.20, 0.05))
+                         dual_alpha = .3,
+                         dual_beta = .06,
+                         alpha_sharing = c(0.80, 0.15, 0.05),
+                         beta_sharing  = c(0.75, 0.20, 0.05))
 
  # creating a data set with 5 plates, lognormal error rates, 10 clones
  # making up the top 60\% of the population in frequency, and a constant

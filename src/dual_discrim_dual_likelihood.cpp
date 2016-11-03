@@ -1,12 +1,22 @@
 #include <Rcpp.h>
 using namespace Rcpp;
-//' Calculate likelihood of dual clone
+//' Calculate likelihood of two beta-sharing candidate alpha-beta pairs deriving from a dual clone
 //'
-//' @param est a
-//' @param err a
-//' @param numb_cells a
-//' @param numb_wells a
-//' @param binomials a
+//' \code{dual_discrim_dual_likelihood()} is used within \code{\link{dual_top}}
+//' to calculate the likelihood that two alpha-beta pairs identified by
+//' \code{\link{bagpipe}} sharing the same beta chain derive from a single
+//' dual-alpha clone (instead of two distinct clones sharing the same beta).
+//'
+//'
+//' @param est Frequency estimate of the putative dual-alpha clone
+//' @param err Mean drop error rate
+//' @param numb_cells Vector containing the number of cells per well
+//' @param numb_wells Vector containing the number of wells with the sample
+//'    sizes given by \code{numb_cells}
+//' @param binomials Calculations of the needed binomial coefficients; this is
+//'    faster in R than in Rcpp (from my own tests)
+//'
+//' @return A numeric containing the negative log likelihood
 //'
 //' @export
 // [[Rcpp::export]]

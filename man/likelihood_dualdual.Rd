@@ -2,22 +2,31 @@
 % Please edit documentation in R/RcppExports.R
 \name{likelihood_dualdual}
 \alias{likelihood_dualdual}
-\title{Calculate likelihood of a single TCR clone}
+\title{Calculate likelihood curve of frequency estimates for a dual-alpha and
+dual-beta TCR clone}
 \usage{
 likelihood_dualdual(est, err, numb_wells, numb_cells, numb_sample)
 }
 \arguments{
-\item{est}{a}
+\item{est}{Clonal frequency estimate}
 
-\item{err}{a}
+\item{err}{Mean drop error rate}
 
-\item{numb_wells}{a}
+\item{numb_wells}{A vector with the number of wells with the distinct
+sample sizes}
 
-\item{numb_cells}{a}
+\item{numb_cells}{A vector of the distinct sample sizes, i.e. the number of
+cells per well}
 
-\item{numb_sample}{a}
+\item{numb_sample}{A vector  with the number of wells of the sample size of
+the same position of \code{numb_cells} that contains both alpha and both
+betachains the clone}
+}
+\value{
+A numeric with the negative log likelihood
 }
 \description{
-Calculate likelihood of a single TCR clone
+Calculate likelihood curve of frequency estimates for a dual-alpha and
+dual-beta TCR clone
 }
 

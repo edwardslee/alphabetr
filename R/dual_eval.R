@@ -158,7 +158,7 @@ dual_eval <- function(duals, pair, TCR, number_skewed, TCR_dual) {
     # false dual rate
     fdr <- (nrow(duals) - numb_correct) / nrow(duals)
 
-    return(tibble::tibble(
+    return(data.frame(
       fdr = fdr,
       numb_cand_duals = nrow(duals),
       adj_depth_top = adj_depth_top,
