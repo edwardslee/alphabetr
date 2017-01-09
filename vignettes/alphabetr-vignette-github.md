@@ -39,24 +39,6 @@ Our goals are to:
 <!-- ```{r echo = FALSE, out.width = 650, fig.retina = NULL, fig.cap = "Figure 1"} -->
 <!-- knitr::include_graphics("overview.png") -->
 <!-- ``` -->
-Simulating sequencing data
---------------------------
-
-Simulating the experimental data involves choosing parameters for two domains:
-
-1.  The clonal structure of the T cell population of interest
-2.  The sequencing experiment
-
-<!-- Both are described in Figure . -->
-**Clonal structure.** We create a T cell population using the function `create_clones()`, which is fully described below, so all I want to do is illustrate what *degree of sharing* means. Suppose the clones in Figure represent our population of interest. We have four unique alpha chains (a1, a2, a3, a4), one of which is shared by two clones (a2 is shared by a2b1, a2b3). In this population, 25% of the alpha chains are shared by two clones, and 75% of the alpha chains are not shared.
-
-**Simulating the sequencing experiment.** Just a remark that there's a lot of parameters to simulate on the experimental side of things.
-
-Running the code
-================
-
-This section of the vignette will show you how to run simulations from start to finish in order to obtain the type of results as shown in the paper. We will first create T cell populations with user-specified attributes, use functions in `alphabetr` to figure our candidates pairs, discriminate between dual-alpha and beta-sharing clones, and then determine clonal frequencies.
-
 Installing and loading alphabetr
 --------------------------------
 
@@ -77,6 +59,136 @@ And then load the package by running
 ``` r
 library(alphabetr)
 ```
+
+Formatting and inputting sequencing data for `alphabetr`
+--------------------------------------------------------
+
+The package includes the function `read_alphabetr()` that will up convert sequencing data to the format used by `alphabetr`. `read_alphabetr()` will accept two forms of CSV files:
+
+1.  A 3-column csv file containing both TCRA and TCRB sequencing information
+
+-   1st column named `chain`: indentification of `"TCRA"`/`"TCRB"` or `"alpha"`/`"beta"`
+-   2nd column named `well`: well number that the chain derives from
+-   3rd column named `cdr3`: the CDR3 sequence
+
+1.  Two 2-column csv files, one containing TCRA sequencing information and the other containing TCRB sequencing information. Each csv file has the following columns
+
+-   1st column named `well`: well number that the chain derives from
+-   2nd column named `cdr3`: the CDR3 sequence
+
+The following is a csv file in the 3-column form
+
+``` r
+# using a string to be read as a csv file (ignore this and see next line of code)
+strcsv <-'"chain","well","cdr3"\n"alpha","1","CAVTGGDKLIF"\n"alpha","1","CALDGDKIIF"\n"alpha","2","CAVTGGDKLIF"\n"beta","1","CASGLARAEQYF"\n"beta","2","CASSEGDKVIF"\n"beta","2","CSEVHTARTQYF"'
+con <- textConnection(strcsv)
+csv3 <- read.csv(con)
+
+# looking at the csv file
+head(csv3)
+#>   chain well         cdr3
+#> 1 alpha    1  CAVTGGDKLIF
+#> 2 alpha    1   CALDGDKIIF
+#> 3 alpha    2  CAVTGGDKLIF
+#> 4  beta    1 CASGLARAEQYF
+#> 5  beta    2  CASSEGDKVIF
+#> 6  beta    2 CSEVHTARTQYF
+```
+
+And the following is the same data in two 2-column csv files:
+
+``` r
+# TCRA file
+strcsv <-'"well","cdr3"\n"1","CAVTGGDKLIF"\n"1","CALDGDKIIF"\n"2","CAVTGGDKLIF"'
+con_alpha <- textConnection(strcsv)
+csv2_alpha <- read.csv(con_alpha)
+
+# TCRB file
+strcsv <-'"well","cdr3"\n"1","CASGLARAEQYF"\n"2","CASSEGDKVIF"\n"2","CSEVHTARTQYF"'
+con_beta <- textConnection(strcsv)
+csv2_beta <- read.csv(con_beta)
+
+head(csv2_alpha)
+#>   well        cdr3
+#> 1    1 CAVTGGDKLIF
+#> 2    1  CALDGDKIIF
+#> 3    2 CAVTGGDKLIF
+head(csv2_beta)
+#>   well         cdr3
+#> 1    1 CASGLARAEQYF
+#> 2    2  CASSEGDKVIF
+#> 3    2 CSEVHTARTQYF
+```
+
+To load your csv files, the call of `read_alphabetr()` differs depending on the format of your csv file(s)
+
+``` r
+# if using one 3 column csv file, using the data argument
+dat <- read_alphabetr(data = "alphabetr_data.csv")
+
+# if using two 2 col csv files, use the data_alpha and data_beta arguments
+dat <- read_alphabetr(data_alpha = "alphabetr_data_alpha.csv"
+                      data_beta  = "alphabetr_data_beta.csv")
+```
+
+Just to demonstrate with the dummy csv file we created just before:
+
+``` r
+# using a string to be read as a csv file (ignore this and see next line of code)
+strcsv <-'"chain","well","cdr3"\n"alpha","1","CAVTGGDKLIF"\n"alpha","1","CALDGDKIIF"\n"alpha","2","CAVTGGDKLIF"\n"beta","1","CASGLARAEQYF"\n"beta","2","CASSEGDKVIF"\n"beta","2","CSEVHTARTQYF"'
+con <- textConnection(strcsv)
+
+# importing the csv file into the format that alphabetr will use
+dat <- read_alphabetr(data = con)
+dat
+#> $alpha
+#>      [,1] [,2]
+#> [1,]    1    1
+#> [2,]    1    0
+#> 
+#> $beta
+#>      [,1] [,2] [,3]
+#> [1,]    1    0    0
+#> [2,]    0    1    1
+#> 
+#> $alpha_lib
+#> [1] "CAVTGGDKLIF" "CALDGDKIIF" 
+#> 
+#> $beta_lib
+#> [1] "CASGLARAEQYF" "CASSEGDKVIF"  "CSEVHTARTQYF"
+```
+
+The output of `read_alphabetr()` is a list of length four. The `alpha` component contains the binary matrix that represents which alpha chains (indexed by column) are found in which wells (indexed by row). The `beta` component is the analogous binary matrix for beta chains. The `alpha_lib` and `beta_lib` are vectors that indicate the actual CDR3 sequences for each chain. For example,
+
+``` r
+# the cdr3 sequence of alpha_2
+dat$alpha_lib[2]
+#> [1] "CALDGDKIIF"
+
+# the cdr3 sequence of beta_3
+dat$beta_lib[3]
+#> [1] "CSEVHTARTQYF"
+```
+
+The rest of the vignette will discuss how to perform simulations on synthetic data sets (by using the function `create_clones()` and `create_data()`). The output of `create_data()` is the same way as the output of `read_alphabetr()` would be used, and so although the rest of the vignette is about performing simulations, the same exact can be used on real data that is processed by `read_alphabetr()`.
+
+Simulating sequencing data
+--------------------------
+
+Simulating the experimental data involves choosing parameters for two domains:
+
+1.  The clonal structure of the T cell population of interest
+2.  The sequencing experiment
+
+<!-- Both are described in Figure . -->
+**Clonal structure.** We create a T cell population using the function `create_clones()`, which is fully described below, so all I want to do is illustrate what *degree of sharing* means. Suppose the clones in Figure represent our population of interest. We have four unique alpha chains (a1, a2, a3, a4), one of which is shared by two clones (a2 is shared by a2b1, a2b3). In this population, 25% of the alpha chains are shared by two clones, and 75% of the alpha chains are not shared.
+
+**Simulating the sequencing experiment.** Just a remark that there's a lot of parameters to simulate on the experimental side of things.
+
+Running the code
+================
+
+This section of the vignette will show you how to run simulations from start to finish in order to obtain the type of results as shown in the paper. We will first create T cell populations with user-specified attributes, use functions in `alphabetr` to figure our candidates pairs, discriminate between dual-alpha and beta-sharing clones, and then determine clonal frequencies.
 
 Creating the clonal structure of the T cell population
 ------------------------------------------------------
@@ -437,6 +549,6 @@ freq_res$correct
 #> [1] 0.84
 ```
 
-[1] Paper was submitted recently
+[1] Paper was recently accepted by PLOS Computational Biology
 
 [2] see the paper to understand the mathematics that's going on.
