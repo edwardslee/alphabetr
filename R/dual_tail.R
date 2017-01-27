@@ -45,7 +45,7 @@ dual_tail <- function(alpha, beta, freq_results, numb_cells) {
       x <- freq[freq[, "beta1"] == clon, , drop = FALSE]  # find clones with the beta index
       numb_cand <- nrow(x)                            # find number of alphas associated with beta
       if (numb_cand > 1) {                            # if more than 1 alpha
-        combos <- combn(numb_cand, 2)                   # find all combos of pairs
+        combos <- utils::combn(numb_cand, 2)                   # find all combos of pairs
         for (ind in 1:ncol(combos)) {                   # check each combo
           alpha1 <- x[combos[1, ind], "alpha1"]
           alpha2 <- x[combos[2, ind], "alpha1"]
@@ -74,7 +74,7 @@ dual_tail <- function(alpha, beta, freq_results, numb_cells) {
       # -the "high" cluster are more likely to be duals
       well_ratio <- rec[, "act_wells"]/rec[, "expt_wells"] # ratio of actual to expected
       if (length(unique(well_ratio)) > 1) {
-        km_out <- kmeans(well_ratio, 2, nstart = 200)      # kmeans of ratios in 2 clusters
+        km_out <- stats::kmeans(well_ratio, 2, nstart = 200)      # kmeans of ratios in 2 clusters
         # figure out which cluster represents "high"
         clus_ind1 <- which(km_out$cluster == 1)            # one cluster
         clus_ind2 <- which(km_out$cluster == 2)            # the other cluster

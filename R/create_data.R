@@ -59,7 +59,6 @@
 #'                     dist = "linear",
 #'                     numb_cells = matrix(c(50, 480), ncol = 2))
 #'
-#'
 #' @export
 create_data <- function(TCR, plates,
                         error_drop,
@@ -121,9 +120,9 @@ create_data <- function(TCR, plates,
     }
 
     # sample drop rates from lognormal distribution; ensure none are greater than 90%
-    drop_vec <- rlnorm(numb_clones, meanlog = mu, sdlog = sd)
+    drop_vec <- stats::rlnorm(numb_clones, meanlog = mu, sdlog = sd)
     while (any(drop_vec > .9)) {
-      drop_vec <- rlnorm(numb_clones, meanlog = mu, sdlog = sd)
+      drop_vec <- stats::rlnorm(numb_clones, meanlog = mu, sdlog = sd)
     }
     TCR_drop <- cbind(TCR, drop_vec)
   } else {
@@ -176,8 +175,8 @@ create_data <- function(TCR, plates,
 
       # sample error rates from LN dist; each chain can be erroneously
       # sequenced into 1-4 distinct different wrong chains
-      err_seq_alph <- rlnorm(numb_alph, meanlog = mu, sdlog = sd)
-      err_seq_beta <- rlnorm(numb_beta, meanlog = mu, sdlog = sd)
+      err_seq_alph <- stats::rlnorm(numb_alph, meanlog = mu, sdlog = sd)
+      err_seq_beta <- stats::rlnorm(numb_beta, meanlog = mu, sdlog = sd)
       # err_num_alph <- sample(1:4, size = numb_alph, replace = TRUE)
       # err_num_beta <- sample(1:4, size = numb_beta, replace = TRUE)
       err_num_alph <- rep(3, numb_alph)
@@ -205,8 +204,8 @@ create_data <- function(TCR, plates,
       # no false sequences, no false sequences associated with any chain
       numb_false_alph <- 0
       numb_false_beta <- 0
-      err_seq_alph <- rep(0, numb_alph) # rlnorm(numb_alph, meanlog = mu, sdlog = sd)
-      err_seq_beta <- rep(0, numb_beta) # rlnorm(numb_beta, meanlog = mu, sdlog = sd)
+      err_seq_alph <- rep(0, numb_alph) # stats::rlnorm(numb_alph, meanlog = mu, sdlog = sd)
+      err_seq_beta <- rep(0, numb_beta) # stats::rlnorm(numb_beta, meanlog = mu, sdlog = sd)
       false_alph <- vector(mode = "list", length = numb_alph)
       false_beta <- vector(mode = "list", length = numb_beta)
     }
@@ -247,9 +246,9 @@ create_data <- function(TCR, plates,
             ind <- ind + 1
           }
       }
-      # col 2 of samp beta has the drop rate; beta_i isn't dropped when runif > err
+      # col 2 of samp beta has the drop rate; beta_i isn't dropped when stats::runif > err
       samp_beta <- samp_beta[!is.na(samp_beta[, 1]), ]
-      samp_beta <- samp_beta[runif(nrow(samp_beta)) > samp_beta[, 2], 1]
+      samp_beta <- samp_beta[stats::runif(nrow(samp_beta)) > samp_beta[, 2], 1]
 
       samp_alph <- matrix(nrow = 2 * nrow(samp_clones), ncol = 2)
       dual_alph <- which(samp_clones[, 3] != samp_clones[, 4])
@@ -266,15 +265,15 @@ create_data <- function(TCR, plates,
         }
       }
       samp_alph <- samp_alph[!is.na(samp_alph[, 1]), ]
-      samp_alph <- samp_alph[runif(nrow(samp_alph)) > samp_alph[, 2], 1]
+      samp_alph <- samp_alph[stats::runif(nrow(samp_alph)) > samp_alph[, 2], 1]
 
-      switch_alph <- which(runif(length(samp_alph)) < err_seq_alph[samp_alph])
+      switch_alph <- which(stats::runif(length(samp_alph)) < err_seq_alph[samp_alph])
       for (a in switch_alph) {
         ind_alph <- samp_alph[a]
         samp_alph[a] <- sample(false_alph[[ind_alph]], size = 1)
       }
 
-      switch_beta <- which(runif(length(samp_beta)) < err_seq_beta[samp_beta])
+      switch_beta <- which(stats::runif(length(samp_beta)) < err_seq_beta[samp_beta])
       for (b in switch_beta) {
         ind_beta <- samp_beta[b]
         samp_beta[b] <- sample(false_beta[[ind_beta]], size = 1)

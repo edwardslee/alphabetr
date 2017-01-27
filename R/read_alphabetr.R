@@ -41,7 +41,7 @@ read_alphabetr <- function(data = NULL, data_alpha = NULL, data_beta = NULL) {
 
   if (!is.null(data)) {
     # reading in the data
-    df <- read.csv(data, stringsAsFactors = FALSE)
+    df <- utils::read.csv(data, stringsAsFactors = FALSE)
     if (ncol(df) != 3)
       stop("Must supply a csv with 3 colums if using the data arguments.
             col 1 specifies 'alpha' or 'beta', col 2 specifies well #,
@@ -80,8 +80,8 @@ read_alphabetr <- function(data = NULL, data_alpha = NULL, data_beta = NULL) {
     }
   } else {
     # reading in the data
-    df_alph <- read.csv(data_alpha, stringsAsFactors = FALSE)
-    df_beta <- read.csv(data_beta, stringsAsFactors = FALSE)
+    df_alph <- utils::read.csv(data_alpha, stringsAsFactors = FALSE)
+    df_beta <- utils::read.csv(data_beta, stringsAsFactors = FALSE)
     if (ncol(df_alph) != 2)
       stop("Must supply a csv with 2 cols if using the data_alph argument.
             col 1 specifies well #, col 2 specifies the CDR3 sequence.")

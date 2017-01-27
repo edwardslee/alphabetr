@@ -51,16 +51,18 @@ NumericVector dual_discrim_shared_likelihood(double est1, double est2, double er
       prob_ba2 += binom[cell - 1] * pow(est2, cell) * pow(1 - est1 - est2, size - cell) * (1 - pow(err, cell)) * (1 - pow(err, cell));
     }
     for (int n1 = 1; n1 < size; n1++) {
-      for (int n2 = 1; n2 <= size - n1;n2 ++) {
+      for (int n2 = 1; n2 <= size - n1; n2 ++) {
         prob_ba1 += multinom(n1 - 1, n2 - 1) * pow(est1, n1) * pow(est2, n2) * pow(1 - est1 - est2, size - n1 - n2) *
-          (pow(err, n2) * (pow(err, n1) - 1) * (pow(err, n2) - 1));
+          (pow(err, n2) * (pow(err, n1) - 1) * (pow(err, n1) - 1) +
+           (1 - pow(err, n1)) * pow(err, n1) * (1 - pow(err, n2)) * pow(err, n2));
 
       }
     }
     for (int n2 = 1; n2 < size; n2++) {
       for (int n1 = 1; n1 <= size - n2; n1++) {
         prob_ba2 += multinom(n1 - 1, n2 - 1) * pow(est2, n2) * pow(est1, n1) * pow(1 - est1 - est2, size - n1 - n2) *
-          (pow(err, n1) * (pow(err, n1) - 1) * (pow(err, n2) - 1));
+          (pow(err, n1) * (pow(err, n2) - 1) * (pow(err, n2) - 1) +
+          (1 - pow(err, n1)) * pow(err, n1) * (1 - pow(err, n2)) * pow(err, n2));
       }
     }
 
@@ -74,8 +76,8 @@ NumericVector dual_discrim_shared_likelihood(double est1, double est2, double er
     for (int n1 = 1; n1 < size; n1++) {
       for (int n2 = 1; n2 <= size - n1; n2++) {
         prob_ba1a2 += multinom(n1 - 1, n2 - 1) * pow(est1, n1) * pow(est2, n2) * pow(1 - est1 - est2, size - n1 - n2) *
-          (pow(err, n1) * (1 - pow(err, n2)) * (1 - pow(err, n2)) + (1 - pow(err, n1)) * (1 - pow(err, n1)) *
-          (1 - pow(err, n2)) * (1 - pow(err, n2)) +  pow(err, n2) * (1 - pow(err, n1)) *(1 - pow(err, n1)));
+          (pow(err, n1) * (1 - pow(err, n1)) * (1 - pow(err, n2)) * (1 - pow(err, n2)) + (1 - pow(err, n1)) * (1 - pow(err, n1)) *
+          (1 - pow(err, n2)) * (1 - pow(err, n2)) +  (1 - pow(err, n2)) * pow(err, n2) * (1 - pow(err, n1)) *(1 - pow(err, n1)));
       }
     }
 
