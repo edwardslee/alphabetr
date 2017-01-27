@@ -81,7 +81,7 @@ dual_top <- function(alpha, beta, pair, error, numb_cells) {
     x <- freq[freq[, "beta1"] == clon, , drop = FALSE]  # find clones with the beta index
     numb_cand <- nrow(x)                            # find number of alphas associated with beta
     if (numb_cand > 1) {                            # if more than 1 alpha
-      combos <- combn(numb_cand, 2)                   # find all combos of pairs
+      combos <- utils::combn(numb_cand, 2)                   # find all combos of pairs
       for (ind in 1:ncol(combos)) {                   # check each combo
         ind_beta <- clon
         ind_alph1 <- x[combos[1, ind], "alpha1"]
@@ -145,7 +145,7 @@ dual_top <- function(alpha, beta, pair, error, numb_cells) {
         }
 
         shared_LL <- dual_discrim_shared_likelihood(f1, f2, .15, numb_wells = well_clone, numb_cells = sample_size_well, binomials = binomial_coeff, multinomials = multinomial_coeff)
-        dual_LL   <- optimize(dual_discrim_dual_likelihood, interval = c(0, .4), err = .15, numb_wells = well_clone,
+        dual_LL   <- stats::optimize(dual_discrim_dual_likelihood, interval = c(0, .4), err = .15, numb_wells = well_clone,
                               numb_cells = sample_size_well, binomials = binomial_coeff)
         dual_LL_LL   <- dual_LL$objective
         dual_LL_freq <- dual_LL$minimum

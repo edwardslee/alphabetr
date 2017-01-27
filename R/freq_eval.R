@@ -90,6 +90,11 @@ freq_eval <- function(freq, number_skewed, TCR, numb_clones, prop_top) {
       } # end if else - dual or not
     } # end if - check if estimatable
   } # end for - i
+
+  # for CRAN checks
+  correct <- CI_length <- MLE <- NULL
+
+  # final processing
   numb_top <- nrow(freq)
   freq <- dplyr::mutate(
             dplyr::filter(freq, correct == 1),

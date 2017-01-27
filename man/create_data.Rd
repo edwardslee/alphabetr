@@ -77,6 +77,5 @@ A list of length 2. The first element is a matrix representing the
                     dist = "linear",
                     numb_cells = matrix(c(50, 480), ncol = 2))
 
-
 }
 

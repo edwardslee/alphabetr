@@ -81,6 +81,9 @@ bagpipe <- function(alpha, beta, replicates = 100, frac = 0.75, bootstrap = FALS
   numb_plates <- nrow(alpha) / 96
   size_rep    <- floor(frac * nrow(alpha))  # number of wells to sample
 
+  # for CRAN checks
+  list_pair1 <- list_pair2 <- NULL
+
   for (plat in 1:replicates) {
     # choose a random subset of the wells of the data without replacement
     # (unless the user wants to bootstrap and use replacement)

@@ -105,19 +105,19 @@ freq_estimate <- function(alpha, beta, pair, error = .15, numb_cells) {
     # calculating the MLE for the frequency point estimate
     # a different C++ function is called depending on what chain(s) are duals
     if (dual_alph & dual_beta & !all_wells) {
-      mle <- optimize(likelihood_dualdual, interval = c(0, .5), maximum = FALSE,
+      mle <- stats::optimize(likelihood_dualdual, interval = c(0, .5), maximum = FALSE,
                       err = error, numb_wells = well_clone,
                       numb_cells = sample_size_well, numb_sample = numb_sample)
     } else if (dual_alph & !dual_beta & !all_wells) {
-      mle <- optimize(likelihood_dual, interval = c(0, .5), maximum = FALSE,
+      mle <- stats::optimize(likelihood_dual, interval = c(0, .5), maximum = FALSE,
                       err = error, numb_wells = well_clone,
                       numb_cells = sample_size_well, numb_sample = numb_sample)
     } else if (dual_beta & !dual_alph & !all_wells) {
-      mle <- optimize(likelihood_dual, interval = c(0, .5), maximum = FALSE,
+      mle <- stats::optimize(likelihood_dual, interval = c(0, .5), maximum = FALSE,
                       err = error, numb_wells = well_clone,
                       numb_cells = sample_size_well, numb_sample = numb_sample)
     } else if (!dual_alph & !dual_beta & !all_wells) {
-      mle <- optimize(likelihood_single, interval = c(0, 0.5), maximum = FALSE,
+      mle <- stats::optimize(likelihood_single, interval = c(0, 0.5), maximum = FALSE,
                       err = error, numb_wells = well_clone,
                       numb_cells = sample_size_well, numb_sample = numb_sample)
     }
@@ -126,7 +126,7 @@ freq_estimate <- function(alpha, beta, pair, error = .15, numb_cells) {
       # Calculate upper bound for the 95% Confidence interval
       CI_upper <- 0
       if (ci_single(x = mle$minimum, MLE = mle)*ci_single(x = .9, MLE = mle) < 0){
-        CI_upper  <- uniroot(ci_single, MLE = mle, lower = mle$minimum,
+        CI_upper  <- stats::uniroot(ci_single, MLE = mle, lower = mle$minimum,
                              upper = .9, tol = .Machine$double.eps)
         CI_upper <- CI_upper$root
       }
@@ -139,7 +139,7 @@ freq_estimate <- function(alpha, beta, pair, error = .15, numb_cells) {
         CI.lower <- 0
       } else {
         if (ci_single(1e-16, mle) * mle$minimum < 0) {
-          CI_lower <- uniroot(ci_single, MLE = mle, lower = 1e-16,
+          CI_lower <- stats::uniroot(ci_single, MLE = mle, lower = 1e-16,
                               upper = mle$minimum, tol = .Machine$double.eps)
           CI_lower <- CI_lower$root
 
