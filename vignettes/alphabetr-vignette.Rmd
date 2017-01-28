@@ -16,9 +16,9 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 # Introduction
 ## A Brief Welcome
 Welcome to the `alphabetr` vignette!
-We've spent a lot of time trying to develop a TCR sequencing approach that is more scaleable than single-cell sequencing, and we're excited for others to use our approach.
-My hope is that this vignette will be clear and transparent in showing how we thought to solve this problem, not as be-all panacea for our sequencing woes but as one step towards the field closer to a gold standard.
-The main purpose of this vignette is to demonstrate how to obtain the results of our paper^[Paper was recently accepted by PLOS Computational Biology] and how to do simulations of your own.
+We've spent a lot of time trying to develop a TCR sequencing approach that is more scaleable than single-cell sequencing, and we're excited for others to use it.
+Our hope is that this vignette will be clear and transparent in showing how we thought to solve this problem, not as be-all panacea for our sequencing woes but as one step towards the field closer to a gold standard.
+The main purpose of this vignette is to demonstrate how to read in your own data, obtain the results of our paper^[http://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1005313], and how to do simulations of your own.
 
 ## Immunology background
 T cell receptors (TCR) are heterodimers of two chains, an alpha chain and a beta chain.
@@ -29,7 +29,7 @@ Identifying TCRs of T cell clones at a minimum requires the identification of th
 We'll start by looking at an overview of how to run the `alphabetr` functions on the sequencing data and then look at the parameters used to simulate the sequencing data.
 
 ## Importing data
-Sequencing data obtained with the alphabetr approach can be imported into R using the `read_alphabetr()` function. 
+Sequencing data obtained with the alphabetr approach can be imported using the `read_alphabetr()` function (see below).
 
 ## Processing the sequencing data
 Our goals are to:
@@ -40,16 +40,16 @@ Our goals are to:
 
 **Determining candidate pairs.**
 We input the sequencing data into `bagpipe()`, which determines candidate alpha-beta pairs.
-The output of `bagpipe()` determines pairs consisting of only one alpha and one beta.
+The output of `bagpipe()` are pairs consisting of only one alpha and one beta.
 
 **Discriminating dual-alpha and beta-sharing clones.**
-We then utilize `freq_estimate()`and then use those estimates in the `dual_top()`/`dual_tail()` functions.
-Although it seems backwards to estimate clonal frequencies before determining dual-alpha clones, `dual_top()`/`dual_tail()` need these frequencies to determine the dual clones^[see the paper to understand the mathematics that's going on.]
+We then utilize `freq_estimate()`and then use its output frequency estimates in the `dual_top()`/`dual_tail()` functions.
+Although it seems backwards to estimate clonal frequencies before determining dual alpha clones, `dual_top()`/`dual_tail()` need these frequencies to determine the dual clones^[the paper explains why this is done]
 `dual_top()`/`dual_tail()` will then tell us which candidates that share the same beta are actually one clone express both alpha chains.
 
 **Estimating clonal frequencies.**
-The final list of candidate clones, which includes both single-alpha and dual-alpha clones, is then passed into `freq_estimate()` in order to get a final list of frequen estimates and 95% frequency confidence intervals.
-The package includes some helper functions to amend the original list of candidate pairs with the newly determined dual-alpha clones (used below in the rest of the vignette).
+The final list of candidate clones, which includes both single-alpha and dual-alpha clones, is then passed into `freq_estimate()` in order to get a final list of frequeny estimates and 95% frequency confidence intervals.
+The package includes some helper functions to amend the original list of candidate pairs with the newly determined dual-alpha clones.
 
 <!-- ```{r echo = FALSE, out.width = 650, fig.retina = NULL, fig.cap = "Figure 1"} -->
 <!-- knitr::include_graphics("overview.png") -->
@@ -72,6 +72,12 @@ And then load the package by running
 ```{r}
 library(alphabetr)
 ```
+
+If and when the package is uploaded to CRAN, the package can be simply installed by running
+```{r eval = FALSE}
+install.packages("alphabetr")
+```
+
 
 ## Formatting and inputting sequencing data for `alphabetr`
 The package includes the function `read_alphabetr()` that will up convert sequencing data to the format used by `alphabetr`.
@@ -160,7 +166,7 @@ Simulating the experimental data involves choosing parameters for two domains:
 <!-- Both are described in Figure . -->
 
 **Clonal structure.** We create a T cell population using the function `create_clones()`, which is fully described below, so all I want to do is illustrate what *degree of sharing* means.
-Suppose the clones in Figure represent our population of interest.
+Suppose we have the clones with the following chains: a1b2, a2b1, a2b3, a3a4b4. 
 We have four unique alpha chains (a1, a2, a3, a4), one of which is shared by two clones (a2 is shared by a2b1, a2b3).
 In this population, 25% of the alpha chains are shared by two clones, and 75% of the alpha chains are not shared.
 
